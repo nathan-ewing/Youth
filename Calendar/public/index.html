@@ -8,48 +8,77 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=PT+Serif:ital@0;1&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --black:    #000;
+      --burgundy: #4D3033;
+      --gold:     #9F936B;
+      --slate:    #3B4A50;
+      --cream:    #faf9f6;
+      --border:   #e8e4db;
+      --text:     #1a1a1a;
+      --muted:    #888;
+      --white:    #fff;
+      --radius-sm: 6px;
+      --radius-md: 12px;
+      --radius-lg: 18px;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-md: 0 4px 16px rgba(0,0,0,0.09), 0 2px 6px rgba(0,0,0,0.05);
+      --shadow-lg: 0 16px 48px rgba(0,0,0,0.13), 0 4px 14px rgba(0,0,0,0.08);
+      --t: 0.18s ease;
+    }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
 
     body {
       font-family: 'PT Serif', Georgia, serif;
-      background: #fff;
-      color: #1a1a1a;
+      background: var(--cream);
+      color: var(--text);
       min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
 
     /* ---- Header ---- */
     header {
-      background: #fff;
-      border-bottom: 1px solid #e5e3dc;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(255,255,255,0.9);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid transparent;
       padding: 0 2rem;
-      height: 64px;
+      height: 68px;
       display: flex;
       align-items: center;
       justify-content: space-between;
+      transition: border-color var(--t), box-shadow var(--t);
+    }
+    header.scrolled {
+      border-bottom-color: var(--border);
+      box-shadow: var(--shadow-sm);
     }
 
     .header-logo {
       display: flex;
       align-items: center;
-      gap: 0.6rem;
+      gap: 0.65rem;
       text-decoration: none;
-      color: #000;
+      color: var(--black);
     }
-
-    .header-logo svg { width: 32px; height: 32px; }
-
+    .header-logo img { width: 38px; height: 38px; object-fit: contain; }
     .header-logo-text {
       font-family: 'Archivo Black', sans-serif;
       font-size: 1rem;
       letter-spacing: 0.01em;
       line-height: 1.1;
     }
-
     .header-logo-sub {
       font-family: 'PT Serif', serif;
-      font-size: 0.7rem;
-      color: #9F936B;
-      letter-spacing: 0.08em;
+      font-size: 0.67rem;
+      color: var(--gold);
+      letter-spacing: 0.1em;
       text-transform: uppercase;
       display: block;
     }
@@ -59,227 +88,273 @@
       align-items: center;
       gap: 1.5rem;
     }
-
     .header-link {
       font-family: 'PT Serif', serif;
-      font-size: 0.85rem;
-      color: #333;
+      font-size: 0.83rem;
+      color: #666;
       text-decoration: none;
       display: flex;
       align-items: center;
       gap: 0.35rem;
-      transition: color 0.15s;
+      transition: color var(--t);
     }
-    .header-link:hover { color: #000; }
+    .header-link:hover { color: var(--black); }
     .header-link svg { width: 15px; height: 15px; fill: currentColor; flex-shrink: 0; }
 
     .admin-link {
-      font-family: 'PT Serif', serif;
-      font-size: 0.8rem;
-      color: #fff;
-      background: #3B4A50;
-      text-decoration: none;
-      padding: 0.4rem 1rem;
-      border-radius: 4px;
-      transition: background 0.15s;
-      letter-spacing: 0.01em;
-    }
-    .admin-link:hover { background: #2d3a3f; }
-
-    /* ---- Page title band ---- */
-    .page-title-band {
-      background: #000;
-      color: #fff;
-      text-align: center;
-      padding: 2.5rem 1rem 2rem;
-    }
-
-    .page-title-band h1 {
       font-family: 'Archivo Black', sans-serif;
-      font-size: 2.2rem;
+      font-size: 0.72rem;
+      letter-spacing: 0.04em;
+      color: var(--white);
+      background: var(--slate);
+      text-decoration: none;
+      padding: 0.45rem 1.1rem;
+      border-radius: var(--radius-sm);
+      transition: background var(--t), transform var(--t), box-shadow var(--t);
+    }
+    .admin-link:hover {
+      background: #2d3a3f;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(59,74,80,0.25);
+    }
+    .admin-link:active { transform: translateY(0); box-shadow: none; }
+
+    /* ---- Hero ---- */
+    .hero {
+      background: var(--black);
+      color: var(--white);
+      text-align: center;
+      padding: 3.75rem 1.5rem 3.25rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% -20%, rgba(159,147,107,0.18) 0%, transparent 65%);
+      pointer-events: none;
+    }
+    .hero h1 {
+      font-family: 'Archivo Black', sans-serif;
+      font-size: clamp(2rem, 5vw, 2.75rem);
       letter-spacing: 0.01em;
-      line-height: 1.1;
+      line-height: 1;
+      position: relative;
+    }
+    .hero-divider {
+      width: 32px;
+      height: 2px;
+      background: var(--gold);
+      margin: 1rem auto 0.8rem;
+      border-radius: 1px;
+    }
+    .hero p {
+      font-family: 'PT Serif', serif;
+      font-size: 0.75rem;
+      color: rgba(159,147,107,0.85);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      position: relative;
     }
 
-    .page-title-band p {
-      font-size: 0.9rem;
-      color: #9F936B;
-      margin-top: 0.4rem;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      font-family: 'PT Serif', serif;
+    /* ---- Main wrapper ---- */
+    .calendar-wrapper {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 0 1.25rem 4rem;
     }
 
     /* ---- Month nav ---- */
     .nav {
       display: flex;
       align-items: center;
-      justify-content: center;
-      gap: 1.25rem;
-      padding: 1.5rem 1.5rem 0.75rem;
+      justify-content: space-between;
+      padding: 1.75rem 0 0.5rem;
     }
-
-    .nav button {
-      background: #fff;
-      border: 1.5px solid #d1cdc4;
-      color: #333;
-      border-radius: 4px;
-      width: 2.2rem;
-      height: 2.2rem;
-      font-size: 1.1rem;
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+    }
+    .nav-btn {
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      color: #666;
+      border-radius: var(--radius-sm);
+      width: 2.1rem;
+      height: 2.1rem;
+      font-size: 1.05rem;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: all 0.15s;
-      font-family: inherit;
+      transition: all var(--t);
+      box-shadow: var(--shadow-sm);
     }
-
-    .nav button:hover {
-      border-color: #3B4A50;
-      color: #3B4A50;
-      background: #f5f4f0;
+    .nav-btn:hover {
+      border-color: var(--slate);
+      color: var(--slate);
+      box-shadow: var(--shadow-md);
+      transform: translateY(-1px);
     }
+    .nav-btn:active { transform: translateY(0); box-shadow: var(--shadow-sm); }
 
-    .nav h2 {
+    #monthLabel {
       font-family: 'Archivo Black', sans-serif;
-      font-size: 1.25rem;
-      min-width: 210px;
+      font-size: 1.2rem;
+      min-width: 195px;
       text-align: center;
-      color: #000;
+      color: var(--black);
       letter-spacing: 0.01em;
+    }
+
+    .today-btn {
+      font-family: 'PT Serif', serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.04em;
+      color: #666;
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      padding: 0.38rem 0.9rem;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all var(--t);
+      box-shadow: var(--shadow-sm);
+    }
+    .today-btn:hover {
+      border-color: var(--slate);
+      color: var(--slate);
+      box-shadow: var(--shadow-md);
     }
 
     /* ---- Legend ---- */
     .legend {
       display: flex;
       flex-wrap: wrap;
-      gap: 0.6rem 1.25rem;
-      padding: 0.25rem 1.5rem 1.25rem;
+      gap: 0.45rem 0.7rem;
+      padding: 0.9rem 0 1.4rem;
       justify-content: center;
-      border-bottom: 1px solid #f0ede6;
-      margin-bottom: 1rem;
     }
-
     .legend-item {
       display: flex;
       align-items: center;
-      gap: 0.45rem;
-      font-size: 0.72rem;
-      color: #555;
-      letter-spacing: 0.03em;
+      gap: 0.4rem;
+      font-size: 0.67rem;
+      color: #666;
+      letter-spacing: 0.04em;
       text-transform: uppercase;
       font-family: 'PT Serif', serif;
+      background: var(--white);
+      padding: 0.28rem 0.75rem 0.28rem 0.55rem;
+      border-radius: 99px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
     }
-
     .legend-dot {
-      width: 9px;
-      height: 9px;
-      border-radius: 2px;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
     }
 
-    /* ---- Calendar grid ---- */
-    .calendar-grid {
-      padding: 0 1.25rem 3rem;
-      max-width: 960px;
-      margin: 0 auto;
-    }
-
+    /* ---- Day headers ---- */
     .day-headers {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
-      gap: 3px;
-      margin-bottom: 3px;
+      gap: 4px;
+      margin-bottom: 4px;
     }
-
     .day-header {
       text-align: center;
       font-family: 'PT Serif', serif;
-      font-size: 0.68rem;
-      font-weight: 400;
-      color: #999;
+      font-size: 0.63rem;
+      color: var(--muted);
       text-transform: uppercase;
-      letter-spacing: 0.08em;
-      padding: 0.4rem 0;
+      letter-spacing: 0.1em;
+      padding: 0.45rem 0;
     }
 
+    /* ---- Month grid ---- */
     .month-grid {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
-      gap: 3px;
+      gap: 4px;
     }
 
     .day-cell {
-      background: #faf9f6;
-      border-radius: 4px;
-      min-height: 88px;
-      padding: 0.45rem 0.4rem;
-      border: 1px solid #ece9e1;
-      transition: border-color 0.1s;
+      background: var(--white);
+      border-radius: var(--radius-sm);
+      min-height: 100px;
+      padding: 0.55rem 0.5rem 0.45rem;
+      border: 1.5px solid var(--border);
+      transition: border-color var(--t), box-shadow var(--t), transform var(--t);
+      position: relative;
     }
-
+    .day-cell:not(.other-month):hover {
+      border-color: rgba(159,147,107,0.55);
+      box-shadow: var(--shadow-md);
+      transform: translateY(-1px);
+      z-index: 2;
+    }
     .day-cell.other-month {
-      background: #f9f8f5;
+      background: rgba(250,249,246,0.45);
+      border-color: transparent;
       opacity: 0.4;
     }
-
     .day-cell.today {
-      border-color: #4D3033;
+      border-color: var(--burgundy);
       border-width: 2px;
-      background: #fff;
+      background: var(--white);
     }
 
     .day-number {
       font-family: 'PT Serif', serif;
-      font-size: 0.75rem;
-      color: #888;
-      margin-bottom: 4px;
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-bottom: 5px;
       line-height: 1;
     }
-
     .day-cell.today .day-number {
-      background: #4D3033;
-      color: #fff;
-      width: 1.5rem;
-      height: 1.5rem;
+      background: var(--burgundy);
+      color: var(--white);
+      width: 1.55rem;
+      height: 1.55rem;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 0.7rem;
+      font-size: 0.67rem;
     }
 
     /* ---- Event chips ---- */
     .event-chip {
       font-family: 'PT Serif', serif;
-      font-size: 0.62rem;
-      padding: 2px 5px;
-      border-radius: 2px;
+      font-size: 0.59rem;
+      padding: 2px 6px;
+      border-radius: 3px;
       margin-bottom: 2px;
       cursor: pointer;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      font-weight: 400;
-      transition: opacity 0.15s;
+      transition: opacity var(--t), transform var(--t);
       display: block;
       letter-spacing: 0.01em;
     }
-
-    .event-chip:hover { opacity: 0.75; }
-    .event-chip.multi-start { border-radius: 2px 0 0 2px; }
+    .event-chip:hover { opacity: 0.78; transform: translateX(1px); }
+    .event-chip.multi-start { border-radius: 3px 0 0 3px; }
     .event-chip.multi-mid   { border-radius: 0; }
-    .event-chip.multi-end   { border-radius: 0 2px 2px 0; }
+    .event-chip.multi-end   { border-radius: 0 3px 3px 0; }
+    .event-chip.past-chip   { opacity: 0.36; }
 
-    /* Type colors - Valor palette */
-    .type-regular   { background: #dce8ed; color: #2a4048; }
-    .type-outing    { background: #e8e2d5; color: #5a4a2a; }
-    .type-special   { background: #e8dde0; color: #5a2d33; }
-    .type-camp      { background: #4D3033; color: #fff; }
-    .type-gospel    { background: #9F936B; color: #fff; }
-    .type-cancelled { background: #ece9e1; color: #999; }
+    .type-regular   { background: #dce8ed; color: #1e3540; }
+    .type-outing    { background: #e8e2d5; color: #4a3c1e; }
+    .type-special   { background: #ecdde0; color: #4a2026; }
+    .type-camp      { background: var(--burgundy); color: var(--white); }
+    .type-gospel    { background: var(--gold); color: var(--white); }
+    .type-cancelled { background: #eceae4; color: #aaa; text-decoration: line-through; }
 
-    /* Legend dots */
     .dot-regular   { background: #3B4A50; }
     .dot-outing    { background: #9F936B; }
     .dot-special   { background: #4D3033; }
@@ -287,189 +362,266 @@
     .dot-gospel    { background: #9F936B; }
     .dot-cancelled { background: #ccc; }
 
-    /* ---- Modal ---- */
+    /* ---- Modal backdrop ---- */
     .modal-backdrop {
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.55);
+      background: rgba(0,0,0,0.48);
       z-index: 100;
       align-items: center;
       justify-content: center;
       padding: 1rem;
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+    }
+    .modal-backdrop.open {
+      display: flex;
+      animation: fadeIn 0.2s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
     }
 
-    .modal-backdrop.open { display: flex; }
-
+    /* ---- Modal ---- */
     .modal {
-      background: #fff;
-      border-radius: 6px;
-      padding: 1.75rem;
-      max-width: 430px;
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      max-width: 440px;
       width: 100%;
       position: relative;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+      box-shadow: var(--shadow-lg);
+      animation: slideUp 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes slideUp {
+      from { transform: translateY(18px); opacity: 0; }
+      to   { transform: translateY(0);    opacity: 1; }
     }
 
     .modal-close {
       position: absolute;
-      top: 1rem;
-      right: 1rem;
-      background: none;
+      top: 1.1rem;
+      right: 1.1rem;
+      background: #f2f0ec;
       border: none;
-      font-size: 1.3rem;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      font-size: 1.05rem;
       cursor: pointer;
-      color: #aaa;
+      color: #999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all var(--t);
       line-height: 1;
-      transition: color 0.15s;
     }
-    .modal-close:hover { color: #000; }
+    .modal-close:hover { background: #e6e2da; color: var(--black); }
 
     .modal-type-badge {
-      display: inline-block;
+      display: inline-flex;
+      align-items: center;
       font-family: 'PT Serif', serif;
-      font-size: 0.68rem;
-      font-weight: 400;
+      font-size: 0.63rem;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.1em;
       padding: 3px 10px;
-      border-radius: 2px;
-      margin-bottom: 0.75rem;
+      border-radius: 99px;
+      margin-bottom: 0.9rem;
     }
-
     .modal h3 {
       font-family: 'Archivo Black', sans-serif;
-      font-size: 1.35rem;
-      margin-bottom: 0.2rem;
+      font-size: 1.4rem;
+      margin-bottom: 0.25rem;
       line-height: 1.2;
-      color: #000;
+      color: var(--black);
       letter-spacing: 0.01em;
     }
-
     .modal-date {
       font-family: 'PT Serif', serif;
       font-size: 0.82rem;
-      color: #9F936B;
-      margin-bottom: 1rem;
+      color: var(--gold);
+      margin-bottom: 1.25rem;
       letter-spacing: 0.02em;
     }
 
+    /* Details block */
+    .modal-details-block {
+      background: var(--cream);
+      border-radius: var(--radius-sm);
+      padding: 0.9rem 1rem;
+      margin-bottom: 0.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
     .modal-detail {
       display: flex;
-      gap: 0.6rem;
-      margin-bottom: 0.45rem;
+      gap: 0.75rem;
       align-items: flex-start;
       font-size: 0.88rem;
       font-family: 'PT Serif', serif;
     }
-
     .modal-detail-label {
-      font-size: 0.68rem;
+      font-size: 0.63rem;
       text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: #9F936B;
-      font-weight: 400;
+      letter-spacing: 0.09em;
+      color: var(--gold);
       flex-shrink: 0;
-      min-width: 52px;
+      min-width: 46px;
       padding-top: 2px;
     }
 
     .modal-description {
-      margin-top: 0.85rem;
-      padding-top: 0.85rem;
-      border-top: 1px solid #ece9e1;
+      margin-top: 0.8rem;
       font-family: 'PT Serif', serif;
       font-size: 0.88rem;
-      color: #333;
-      line-height: 1.6;
+      color: #444;
+      line-height: 1.65;
     }
-
     .modal-notes {
-      margin-top: 0.5rem;
+      margin-top: 0.55rem;
       font-family: 'PT Serif', serif;
       font-size: 0.78rem;
-      color: #9F936B;
+      color: var(--gold);
       font-style: italic;
     }
+    .modal-flyer {
+      width: 100%;
+      max-height: 180px;
+      object-fit: cover;
+      border-radius: var(--radius-sm);
+      margin-bottom: 1.1rem;
+      display: block;
+    }
 
+    /* ---- Action buttons ---- */
     .modal-rsvp-btn {
       display: none;
-      margin-top: 1.25rem;
       width: 100%;
-      padding: 0.7rem 1rem;
-      background: #3B4A50;
-      color: #fff;
+      margin-top: 1.4rem;
+      padding: 0.82rem 1rem;
+      background: var(--slate);
+      color: var(--white);
       border: none;
-      border-radius: 4px;
+      border-radius: var(--radius-sm);
       font-family: 'Archivo Black', sans-serif;
-      font-size: 0.85rem;
-      letter-spacing: 0.04em;
+      font-size: 0.78rem;
+      letter-spacing: 0.05em;
       cursor: pointer;
-      transition: background 0.15s;
+      transition: all var(--t);
     }
-    .modal-rsvp-btn:hover { background: #2d3a3f; }
-    .modal-rsvp-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+    .modal-rsvp-btn:hover { background: #2d3a3f; transform: translateY(-1px); box-shadow: 0 4px 14px rgba(59,74,80,0.28); }
+    .modal-rsvp-btn:active { transform: translateY(0); box-shadow: none; }
+    .modal-rsvp-btn:disabled { opacity: 0.42; cursor: not-allowed; transform: none; box-shadow: none; }
     .modal-rsvp-btn.visible { display: block; }
 
-    /* RSVP modal */
+    .modal-pay-btn {
+      display: none;
+      width: 100%;
+      padding: 0.82rem 1rem;
+      background: var(--slate);
+      color: var(--white);
+      border: none;
+      border-radius: var(--radius-sm);
+      font-family: 'Archivo Black', sans-serif;
+      font-size: 0.78rem;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+      transition: all var(--t);
+    }
+    .modal-pay-btn:hover { background: #2d3a3f; transform: translateY(-1px); }
+    .modal-pay-btn.visible { display: block; }
+
+    .modal-ics-btn {
+      width: 100%;
+      margin-top: 0.55rem;
+      padding: 0.65rem 1rem;
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-family: 'PT Serif', serif;
+      font-size: 0.82rem;
+      color: #555;
+      cursor: pointer;
+      transition: all var(--t);
+    }
+    .modal-ics-btn:hover { border-color: var(--slate); color: var(--slate); background: #f8f9fa; }
+
+    .modal-share-btn {
+      width: 100%;
+      margin-top: 0.45rem;
+      padding: 0.5rem 1rem;
+      background: transparent;
+      border: 1px solid #dedad3;
+      border-radius: var(--radius-sm);
+      font-family: 'PT Serif', serif;
+      font-size: 0.75rem;
+      color: #bbb;
+      cursor: pointer;
+      transition: all var(--t);
+    }
+    .modal-share-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+    /* ---- RSVP modal ---- */
     .rsvp-modal {
-      max-width: 500px;
+      max-width: 480px;
       max-height: 90vh;
       overflow-y: auto;
-      padding: 1.75rem;
+      padding: 2rem;
     }
-
-    .rsvp-header { margin-bottom: 1rem; }
-
+    .rsvp-header { margin-bottom: 1.1rem; }
     .rsvp-intro {
       font-family: 'PT Serif', serif;
       font-size: 0.85rem;
       color: #666;
-      margin-bottom: 1.1rem;
-      line-height: 1.6;
+      margin-bottom: 1.25rem;
+      line-height: 1.65;
     }
-
     .rsvp-section-label {
       font-family: 'PT Serif', serif;
-      font-size: 0.68rem;
-      letter-spacing: 0.08em;
+      font-size: 0.63rem;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
-      color: #9F936B;
-      margin: 1rem 0 0.5rem;
+      color: var(--gold);
+      margin: 1.1rem 0 0.6rem;
     }
-
     .rsvp-row {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 0.65rem;
     }
-
     .rsvp-field { margin-bottom: 0.65rem; }
     .rsvp-field--sm { max-width: 120px; }
-
     .rsvp-field label {
       display: block;
       font-family: 'PT Serif', serif;
-      font-size: 0.72rem;
+      font-size: 0.68rem;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: #666;
-      margin-bottom: 0.35rem;
+      letter-spacing: 0.07em;
+      color: #777;
+      margin-bottom: 0.4rem;
     }
-
     .rsvp-field input {
       width: 100%;
-      padding: 0.55rem 0.75rem;
-      border: 1.5px solid #d1cdc4;
-      border-radius: 4px;
+      padding: 0.62rem 0.85rem;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
       font-size: 0.9rem;
       font-family: 'PT Serif', serif;
       outline: none;
-      transition: border-color 0.15s;
-      background: #fff;
+      transition: border-color var(--t), box-shadow var(--t);
+      background: var(--white);
+      color: var(--text);
     }
-    .rsvp-field input:focus { border-color: #3B4A50; }
-
+    .rsvp-field input:focus {
+      border-color: var(--slate);
+      box-shadow: 0 0 0 3px rgba(59,74,80,0.1);
+    }
     .rsvp-error {
       font-size: 0.8rem;
       color: #c0392b;
@@ -477,172 +629,126 @@
       min-height: 1.1rem;
       font-family: 'PT Serif', serif;
     }
-
     .rsvp-submit-btn {
       width: 100%;
       margin-top: 0.5rem;
-      padding: 0.7rem 1rem;
-      background: #3B4A50;
-      color: #fff;
+      padding: 0.82rem 1rem;
+      background: var(--slate);
+      color: var(--white);
       border: none;
-      border-radius: 4px;
+      border-radius: var(--radius-sm);
       font-family: 'Archivo Black', sans-serif;
-      font-size: 0.85rem;
-      letter-spacing: 0.04em;
+      font-size: 0.78rem;
+      letter-spacing: 0.05em;
       cursor: pointer;
-      transition: background 0.15s;
+      transition: all var(--t);
     }
-    .rsvp-submit-btn:hover { background: #2d3a3f; }
-    .rsvp-submit-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+    .rsvp-submit-btn:hover { background: #2d3a3f; transform: translateY(-1px); }
+    .rsvp-submit-btn:disabled { opacity: 0.42; cursor: not-allowed; transform: none; }
 
     .rsvp-pay-section { margin-top: 1.1rem; }
-
     .rsvp-pay-divider {
       display: flex;
       align-items: center;
       gap: 0.6rem;
       font-family: 'PT Serif', serif;
-      font-size: 0.68rem;
-      color: #bbb;
+      font-size: 0.63rem;
+      color: #ccc;
       text-transform: uppercase;
-      letter-spacing: 0.06em;
+      letter-spacing: 0.09em;
       margin-bottom: 0.75rem;
     }
     .rsvp-pay-divider::before,
-    .rsvp-pay-divider::after { content: ''; flex: 1; height: 1px; background: #ece9e1; }
-
+    .rsvp-pay-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
     .rsvp-pay-note {
       font-family: 'PT Serif', serif;
       font-size: 0.78rem;
-      color: #9F936B;
+      color: var(--gold);
       text-align: center;
       margin-top: 0.5rem;
     }
 
+    /* ---- RSVP success ---- */
     .rsvp-success { text-align: center; padding: 0.5rem 0; }
-
     .rsvp-success-icon {
-      width: 48px;
-      height: 48px;
-      background: #3B4A50;
-      color: #fff;
+      width: 52px;
+      height: 52px;
+      background: var(--slate);
+      color: var(--white);
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 1.4rem;
-      font-weight: 700;
-      margin: 0 auto 1rem;
+      margin: 0 auto 1.1rem;
     }
+    .rsvp-success h3 { font-family: 'Archivo Black', sans-serif; margin-bottom: 0.5rem; }
+    .rsvp-success p  { font-family: 'PT Serif', serif; font-size: 0.88rem; color: #666; }
 
-    .rsvp-success h3 {
-      font-family: 'Archivo Black', sans-serif;
-      margin-bottom: 0.5rem;
-    }
-    .rsvp-success p { font-family: 'PT Serif', serif; font-size: 0.88rem; color: #666; }
-
-    .modal-pay-btn {
-      display: none;
-      margin-top: 1.1rem;
-      width: 100%;
-      padding: 0.7rem 1rem;
-      background: #3B4A50;
-      color: #fff;
-      border: none;
-      border-radius: 4px;
-      font-family: 'Archivo Black', sans-serif;
-      font-size: 0.85rem;
-      letter-spacing: 0.04em;
-      cursor: pointer;
-      text-align: center;
-      text-decoration: none;
-      transition: background 0.15s;
-    }
-    .modal-pay-btn:hover { background: #2d3a3f; }
-    .modal-pay-btn.visible { display: block; }
-
-    .modal-ics-btn {
-      margin-top: 0.6rem;
-      width: 100%;
-      padding: 0.6rem 1rem;
-      background: #fff;
-      border: 1.5px solid #d1cdc4;
-      border-radius: 4px;
-      font-family: 'PT Serif', serif;
-      font-size: 0.82rem;
-      color: #333;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-    .modal-ics-btn:hover { border-color: #3B4A50; color: #3B4A50; }
-
-    .event-chip.past-chip { opacity: 0.4; }
-
-    .modal-flyer {
-      width: 100%;
-      max-height: 200px;
-      object-fit: cover;
-      border-radius: 4px;
-      margin-bottom: 1rem;
-      display: block;
-    }
-
-    .modal-share-btn {
-      margin-top: 0.5rem;
-      width: 100%;
-      padding: 0.55rem 1rem;
-      background: transparent;
-      border: 1.5px solid #ece9e1;
-      border-radius: 4px;
-      font-family: 'PT Serif', serif;
-      font-size: 0.78rem;
-      color: #aaa;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-    .modal-share-btn:hover { border-color: #9F936B; color: #9F936B; }
-
+    /* ---- Mobile footer ---- */
     .mobile-footer { display: none; }
 
+    /* ---- Responsive ---- */
     @media (max-width: 640px) {
       header { padding: 0 1rem; }
       .header-links .header-link:not(.admin-link) { display: none; }
-      .page-title-band h1 { font-size: 1.6rem; }
-      .day-cell { min-height: 60px; padding: 0.3rem; }
-      .day-header { font-size: 0.58rem; }
-      .event-chip { font-size: 0.55rem; }
-      .nav h2 { font-size: 1rem; min-width: 170px; }
+
+      .hero { padding: 2.5rem 1.25rem 2.1rem; }
+
+      .day-cell { min-height: 62px; padding: 0.32rem 0.28rem 0.25rem; }
+      .day-header { font-size: 0.56rem; }
+      .event-chip { font-size: 0.5rem; padding: 1px 4px; }
+      #monthLabel { font-size: 0.98rem; min-width: 155px; }
+      .day-cell:not(.other-month):hover { transform: none; box-shadow: none; }
+
+      /* Bottom sheet */
+      .modal-backdrop {
+        align-items: flex-end;
+        padding: 0;
+      }
+      .modal, .rsvp-modal {
+        max-width: 100%;
+        width: 100%;
+        border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+        padding: 1.5rem 1.25rem 2.25rem;
+        animation: sheetUp 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+        max-height: 90vh;
+        overflow-y: auto;
+      }
+      @keyframes sheetUp {
+        from { transform: translateY(100%); }
+        to   { transform: translateY(0); }
+      }
 
       .mobile-footer {
         display: flex;
         flex-direction: column;
         align-items: center;
         gap: 0.75rem;
-        padding: 1.5rem 1rem;
-        border-top: 1px solid #ece9e1;
-        background: #faf9f6;
+        padding: 1.75rem 1rem 2.25rem;
+        border-top: 1px solid var(--border);
+        background: var(--white);
       }
-
       .footer-link {
         display: flex;
         align-items: center;
         gap: 0.4rem;
         font-family: 'PT Serif', serif;
         font-size: 0.85rem;
-        color: #333;
+        color: #555;
         text-decoration: none;
-        transition: color 0.15s;
+        transition: color var(--t);
       }
-      .footer-link:hover { color: #000; }
-      .footer-link svg { width: 16px; height: 16px; fill: currentColor; flex-shrink: 0; }
+      .footer-link:hover { color: var(--black); }
+      .footer-link svg { width: 15px; height: 15px; fill: currentColor; flex-shrink: 0; }
     }
   </style>
 </head>
 <body>
 
-<header>
+<header id="siteHeader">
   <a href="/" class="header-logo">
-    <img src="/valor-mark.png" alt="Valor" style="width:40px;height:40px;object-fit:contain;">
+    <img src="/valor-mark.png" alt="Valor">
     <div>
       <div class="header-logo-text">Valor Youth</div>
       <span class="header-logo-sub">Events Calendar</span>
@@ -661,27 +767,31 @@
   </div>
 </header>
 
-<div class="page-title-band">
+<div class="hero">
   <h1>Youth Events</h1>
+  <div class="hero-divider"></div>
   <p>Valor Church &mdash; Arvada, CO</p>
 </div>
 
-<div class="nav">
-  <button id="prevBtn" title="Previous month">&#8249;</button>
-  <h2 id="monthLabel"></h2>
-  <button id="nextBtn" title="Next month">&#8250;</button>
-</div>
+<div class="calendar-wrapper">
+  <div class="nav">
+    <div class="nav-left">
+      <button class="nav-btn" id="prevBtn" title="Previous month">&#8249;</button>
+      <h2 id="monthLabel"></h2>
+      <button class="nav-btn" id="nextBtn" title="Next month">&#8250;</button>
+    </div>
+    <button class="today-btn" id="todayBtn">Today</button>
+  </div>
 
-<div class="legend">
-  <div class="legend-item"><div class="legend-dot dot-regular"></div> Regular Youth</div>
-  <div class="legend-item"><div class="legend-dot dot-outing"></div> Outing</div>
-  <div class="legend-item"><div class="legend-dot dot-special"></div> Special Event</div>
-  <div class="legend-item"><div class="legend-dot dot-camp"></div> Camp</div>
-  <div class="legend-item"><div class="legend-dot dot-gospel"></div> Gospel Night</div>
-  <div class="legend-item"><div class="legend-dot dot-cancelled"></div> No Youth</div>
-</div>
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot dot-regular"></div> Regular Youth</div>
+    <div class="legend-item"><div class="legend-dot dot-outing"></div> Outing</div>
+    <div class="legend-item"><div class="legend-dot dot-special"></div> Special Event</div>
+    <div class="legend-item"><div class="legend-dot dot-camp"></div> Camp</div>
+    <div class="legend-item"><div class="legend-dot dot-gospel"></div> Gospel Night</div>
+    <div class="legend-item"><div class="legend-dot dot-cancelled"></div> No Youth</div>
+  </div>
 
-<div class="calendar-grid">
   <div class="day-headers">
     <div class="day-header">Sun</div>
     <div class="day-header">Mon</div>
@@ -694,6 +804,7 @@
   <div class="month-grid" id="monthGrid"></div>
 </div>
 
+<!-- Event detail modal -->
 <div class="modal-backdrop" id="modalBackdrop">
   <div class="modal" id="modal">
     <button class="modal-close" id="modalClose">&times;</button>
@@ -752,7 +863,6 @@
       </div>
 
       <div class="rsvp-error" id="rsvpError"></div>
-
       <button class="rsvp-submit-btn" id="rsvpSubmit">Submit RSVP</button>
 
       <div class="rsvp-pay-section" id="rsvpPaySection">
@@ -779,7 +889,24 @@
   </div>
 </div>
 
+<footer class="mobile-footer">
+  <a href="mailto:youth@valor.church" class="footer-link">
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"/></svg>
+    youth@valor.church
+  </a>
+  <a href="https://instagram.com/_valoryouth" target="_blank" rel="noopener" class="footer-link">
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 1.366.062 2.633.334 3.608 1.308.975.975 1.246 2.242 1.308 3.608.058 1.266.07 1.646.07 4.85s-.012 3.584-.07 4.85c-.062 1.366-.334 2.633-1.308 3.608-.975.975-2.242 1.246-3.608 1.308-1.266.058-1.646.07-4.85.07s-3.584-.012-4.85-.07c-1.366-.062-2.633-.334-3.608-1.308-.975-.975-1.246-2.242-1.308-3.608C2.175 15.584 2.163 15.204 2.163 12s.012-3.584.07-4.85c.062-1.366.334-2.633 1.308-3.608.975-.975 2.242-1.246 3.608-1.308 1.266-.058 1.646-.07 4.85-.07zm0-2.163c-3.259 0-3.667.014-4.947.072-1.613.074-3.067.418-4.205 1.557C1.709 2.768 1.365 4.222 1.291 5.835 1.233 7.115 1.219 7.523 1.219 12c0 4.477.014 4.885.072 6.165.074 1.613.418 3.067 1.557 4.205 1.138 1.139 2.592 1.483 4.205 1.557C8.333 23.986 8.741 24 12 24s3.667-.014 4.947-.072c1.613-.074 3.067-.418 4.205-1.557 1.139-1.138 1.483-2.592 1.557-4.205.058-1.28.072-1.688.072-6.165 0-4.477-.014-4.885-.072-6.165-.074-1.613-.418-3.067-1.557-4.205C19.014.49 17.56.146 15.947.072 14.667.014 14.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zm0 10.162a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+    @_valoryouth
+  </a>
+</footer>
+
 <script>
+  // Sticky header shadow on scroll
+  const siteHeader = document.getElementById('siteHeader');
+  window.addEventListener('scroll', () => {
+    siteHeader.classList.toggle('scrolled', window.scrollY > 8);
+  }, { passive: true });
+
   const TYPE_LABELS = {
     regular:   'Regular Youth',
     outing:    'Outing',
@@ -793,7 +920,7 @@
   let currentYear, currentMonth;
 
   const today = new Date();
-  currentYear = today.getFullYear();
+  currentYear  = today.getFullYear();
   currentMonth = today.getMonth();
 
   async function loadEvents() {
@@ -801,7 +928,7 @@
     events = await res.json();
     renderCalendar();
 
-    const params = new URLSearchParams(location.search);
+    const params  = new URLSearchParams(location.search);
     const eventId = params.get('event');
     if (eventId) {
       const evt = events.find(e => e.id === eventId);
@@ -817,16 +944,16 @@
 
   function renderCalendar() {
     const label = document.getElementById('monthLabel');
-    const grid = document.getElementById('monthGrid');
+    const grid  = document.getElementById('monthGrid');
 
     const monthNames = ['January','February','March','April','May','June',
                         'July','August','September','October','November','December'];
     label.textContent = `${monthNames[currentMonth]} ${currentYear}`;
 
-    const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+    const firstDay    = new Date(currentYear, currentMonth, 1).getDay();
     const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-    const daysInPrev = new Date(currentYear, currentMonth, 0).getDate();
-    const totalCells = Math.ceil((firstDay + daysInMonth) / 7) * 7;
+    const daysInPrev  = new Date(currentYear, currentMonth, 0).getDate();
+    const totalCells  = Math.ceil((firstDay + daysInMonth) / 7) * 7;
 
     grid.innerHTML = '';
 
@@ -838,38 +965,37 @@
 
       if (i < firstDay) {
         dayNum = daysInPrev - firstDay + i + 1;
-        month = currentMonth === 0 ? 11 : currentMonth - 1;
-        year = currentMonth === 0 ? currentYear - 1 : currentYear;
+        month  = currentMonth === 0 ? 11 : currentMonth - 1;
+        year   = currentMonth === 0 ? currentYear - 1 : currentYear;
         isOtherMonth = true;
       } else if (i >= firstDay + daysInMonth) {
         dayNum = i - firstDay - daysInMonth + 1;
-        month = currentMonth === 11 ? 0 : currentMonth + 1;
-        year = currentMonth === 11 ? currentYear + 1 : currentYear;
+        month  = currentMonth === 11 ? 0 : currentMonth + 1;
+        year   = currentMonth === 11 ? currentYear + 1 : currentYear;
         isOtherMonth = true;
       } else {
         dayNum = i - firstDay + 1;
-        month = currentMonth;
-        year = currentYear;
+        month  = currentMonth;
+        year   = currentYear;
       }
 
       if (isOtherMonth) cell.classList.add('other-month');
 
       const cellDate = new Date(year, month, dayNum);
-      const isToday = cellDate.toDateString() === today.toDateString();
-      if (isToday) cell.classList.add('today');
+      if (cellDate.toDateString() === today.toDateString()) cell.classList.add('today');
 
       const numEl = document.createElement('div');
-      numEl.className = 'day-number';
+      numEl.className  = 'day-number';
       numEl.textContent = dayNum;
       cell.appendChild(numEl);
 
-      const dateStr = `${year}-${String(month + 1).padStart(2,'0')}-${String(dayNum).padStart(2,'0')}`;
-      const dayEvents = getEventsForDate(dateStr);
+      const dateStr  = `${year}-${String(month + 1).padStart(2,'0')}-${String(dayNum).padStart(2,'0')}`;
+      const dayEvts  = getEventsForDate(dateStr);
 
-      dayEvents.forEach(({ event, span }) => {
+      dayEvts.forEach(({ event, span }) => {
         const chip = document.createElement('div');
         const spanClass = span === 'single' ? '' : ` multi-${span}`;
-        chip.className = `event-chip type-${event.type}${spanClass}`;
+        chip.className   = `event-chip type-${event.type}${spanClass}`;
         chip.textContent = span === 'mid' ? ' ' : event.title;
         chip.setAttribute('title', event.title);
         chip.addEventListener('click', () => showModal(event));
@@ -882,23 +1008,17 @@
 
   function getEventsForDate(dateStr) {
     return events
-      .filter(e => {
-        if (e.endDate) {
-          return dateStr >= e.date && dateStr <= e.endDate;
-        }
-        return e.date === dateStr;
-      })
+      .filter(e => e.endDate ? (dateStr >= e.date && dateStr <= e.endDate) : e.date === dateStr)
       .map(e => ({
         event: e,
         span: !e.endDate ? 'single'
-          : (dateStr === e.date ? 'start'
-          : (dateStr === e.endDate ? 'end' : 'mid'))
+          : (dateStr === e.date ? 'start' : (dateStr === e.endDate ? 'end' : 'mid'))
       }));
   }
 
   function formatDate(dateStr, endDateStr) {
     const opts = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    const d = new Date(dateStr + 'T12:00:00');
+    const d    = new Date(dateStr + 'T12:00:00');
     if (endDateStr) {
       const end = new Date(endDateStr + 'T12:00:00');
       return `${d.toLocaleDateString('en-US', opts)} - ${end.toLocaleDateString('en-US', opts)}`;
@@ -909,48 +1029,49 @@
   function showModal(event) {
     const badge = document.getElementById('modalBadge');
     badge.textContent = TYPE_LABELS[event.type] || event.type;
-    badge.className = `modal-type-badge type-${event.type}`;
+    badge.className   = `modal-type-badge type-${event.type}`;
 
     document.getElementById('modalTitle').textContent = event.title;
-    document.getElementById('modalDate').textContent = formatDate(event.date, event.endDate);
+    document.getElementById('modalDate').textContent  = formatDate(event.date, event.endDate);
 
     const details = document.getElementById('modalDetails');
     details.innerHTML = '';
 
-    if (event.time) {
-      details.innerHTML += `<div class="modal-detail"><span class="modal-detail-label">Time</span><span>${event.time}</span></div>`;
-    }
-    if (event.location) {
-      details.innerHTML += `<div class="modal-detail"><span class="modal-detail-label">Where</span><span>${event.location}</span></div>`;
-    }
-    if (event.cost) {
-      details.innerHTML += `<div class="modal-detail"><span class="modal-detail-label">Cost</span><span>${event.cost}</span></div>`;
+    const rows = [];
+    if (event.time)     rows.push({ label: 'Time',  value: event.time });
+    if (event.location) rows.push({ label: 'Where', value: event.location });
+    if (event.cost)     rows.push({ label: 'Cost',  value: event.cost });
+
+    if (rows.length) {
+      const block = document.createElement('div');
+      block.className = 'modal-details-block';
+      rows.forEach(({ label, value }) => {
+        block.innerHTML += `<div class="modal-detail"><span class="modal-detail-label">${label}</span><span>${value}</span></div>`;
+      });
+      details.appendChild(block);
     }
 
     const desc = document.getElementById('modalDesc');
-    desc.textContent = event.description || '';
+    desc.textContent  = event.description || '';
     desc.style.display = event.description ? '' : 'none';
 
     const notes = document.getElementById('modalNotes');
-    notes.textContent = event.notes ? `Note: ${event.notes}` : '';
+    notes.textContent  = event.notes ? `Note: ${event.notes}` : '';
     notes.style.display = event.notes ? '' : 'none';
 
     const flyer = document.getElementById('modalFlyer');
-    if (event.imageUrl) {
-      flyer.src = event.imageUrl;
-      flyer.style.display = 'block';
-    } else {
-      flyer.style.display = 'none';
-    }
+    flyer.style.display = event.imageUrl ? 'block' : 'none';
+    if (event.imageUrl) flyer.src = event.imageUrl;
 
     const showRsvp = event.rsvpEnabled !== undefined
       ? event.rsvpEnabled
       : (['outing', 'special', 'camp'].includes(event.type) || !!event.cost);
+
     const rsvpBtn = document.getElementById('modalRsvpBtn');
     rsvpBtn.classList.toggle('visible', showRsvp);
-    rsvpBtn.disabled = false;
+    rsvpBtn.disabled    = false;
     rsvpBtn.textContent = 'RSVP & Register';
-    rsvpBtn.onclick = () => openRsvp(event);
+    rsvpBtn.onclick     = () => openRsvp(event);
 
     if (showRsvp && event.rsvpCapacity) {
       fetch(`/api/events/${event.id}/spots`)
@@ -958,7 +1079,7 @@
         .then(spots => {
           if (spots.full) {
             rsvpBtn.textContent = 'Event Full';
-            rsvpBtn.disabled = true;
+            rsvpBtn.disabled    = true;
           } else {
             rsvpBtn.textContent = `RSVP & Register (${spots.available} spot${spots.available !== 1 ? 's' : ''} left)`;
           }
@@ -966,7 +1087,7 @@
         .catch(() => {});
     }
 
-    document.getElementById('modalIcsBtn').onclick = () => downloadICS(event);
+    document.getElementById('modalIcsBtn').onclick   = () => downloadICS(event);
     document.getElementById('modalShareBtn').onclick = () => {
       const url = `${location.origin}/?event=${event.id}`;
       navigator.clipboard.writeText(url).then(() => {
@@ -986,23 +1107,20 @@
     rsvpCurrentEvent = event;
     document.getElementById('modalBackdrop').classList.remove('open');
 
-    document.getElementById('rsvpBadge').textContent = TYPE_LABELS[event.type] || event.type;
-    document.getElementById('rsvpBadge').className = `modal-type-badge type-${event.type}`;
+    document.getElementById('rsvpBadge').textContent  = TYPE_LABELS[event.type] || event.type;
+    document.getElementById('rsvpBadge').className    = `modal-type-badge type-${event.type}`;
     document.getElementById('rsvpEventTitle').textContent = event.title;
-    document.getElementById('rsvpEventDate').textContent = formatDate(event.date, event.endDate);
+    document.getElementById('rsvpEventDate').textContent  = formatDate(event.date, event.endDate);
 
     const showPayment = event.requirePayment !== undefined ? event.requirePayment : !!event.cost;
-    const paySection = document.getElementById('rsvpPaySection');
-    paySection.style.display = showPayment ? '' : 'none';
+    document.getElementById('rsvpPaySection').style.display = showPayment ? '' : 'none';
+    document.getElementById('rsvpCostNote').textContent     = showPayment && event.cost ? `Cost: ${event.cost}` : '';
 
-    const costNote = document.getElementById('rsvpCostNote');
-    costNote.textContent = showPayment && event.cost ? `Cost: ${event.cost}` : '';
-
-    document.getElementById('rsvpForm').style.display = '';
+    document.getElementById('rsvpForm').style.display    = '';
     document.getElementById('rsvpSuccess').style.display = 'none';
-    document.getElementById('rsvpError').textContent = '';
-    document.getElementById('rsvpSubmit').disabled = false;
-    document.getElementById('rsvpSubmit').textContent = 'Submit RSVP';
+    document.getElementById('rsvpError').textContent     = '';
+    document.getElementById('rsvpSubmit').disabled       = false;
+    document.getElementById('rsvpSubmit').textContent    = 'Submit RSVP';
 
     ['rStudentName','rStudentAge','rParentName','rPhone','rEmail'].forEach(id => {
       document.getElementById(id).value = '';
@@ -1014,11 +1132,9 @@
   document.getElementById('rsvpClose').addEventListener('click', () => {
     document.getElementById('rsvpBackdrop').classList.remove('open');
   });
-
   document.getElementById('rsvpBackdrop').addEventListener('click', e => {
-    if (e.target === document.getElementById('rsvpBackdrop')) {
+    if (e.target === document.getElementById('rsvpBackdrop'))
       document.getElementById('rsvpBackdrop').classList.remove('open');
-    }
   });
 
   document.getElementById('rsvpSubmit').addEventListener('click', async () => {
@@ -1040,17 +1156,14 @@
 
     errorEl.textContent = '';
     const btn = document.getElementById('rsvpSubmit');
-    btn.disabled = true;
+    btn.disabled    = true;
     btn.textContent = 'Sending…';
 
     try {
       const res = await fetch('/api/rsvp', {
-        method: 'POST',
+        method:  'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          eventId:     rsvpCurrentEvent.id,
-          studentName, studentAge, parentName, phone, email
-        })
+        body:    JSON.stringify({ eventId: rsvpCurrentEvent.id, studentName, studentAge, parentName, phone, email })
       });
 
       if (!res.ok) {
@@ -1059,52 +1172,43 @@
       }
 
       document.getElementById('rsvpSuccessEmail').textContent = email;
-      const successPaySection = document.getElementById('rsvpSuccessPaySection');
-      const showSuccessPayment = rsvpCurrentEvent.requirePayment !== undefined
+      const showPay = rsvpCurrentEvent.requirePayment !== undefined
         ? rsvpCurrentEvent.requirePayment : !!rsvpCurrentEvent.cost;
-      successPaySection.style.display = showSuccessPayment ? '' : 'none';
+      document.getElementById('rsvpSuccessPaySection').style.display = showPay ? '' : 'none';
       document.getElementById('rsvpSuccessIcs').onclick = () => downloadICS(rsvpCurrentEvent);
 
-      document.getElementById('rsvpForm').style.display = 'none';
+      document.getElementById('rsvpForm').style.display    = 'none';
       document.getElementById('rsvpSuccess').style.display = '';
     } catch (err) {
       errorEl.textContent = err.message;
-      btn.disabled = false;
-      btn.textContent = 'Submit RSVP';
+      btn.disabled        = false;
+      btn.textContent     = 'Submit RSVP';
     }
   });
 
-  function toICSDate(dateStr) {
-    return dateStr.replace(/-/g, '');
-  }
-
+  function toICSDate(dateStr) { return dateStr.replace(/-/g, ''); }
   function nextDay(dateStr) {
     const d = new Date(dateStr + 'T12:00:00');
     d.setDate(d.getDate() + 1);
     return d.toISOString().slice(0, 10).replace(/-/g, '');
   }
-
   function escapeICS(str) {
     return (str || '').replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\n/g, '\\n');
   }
 
   function downloadICS(event) {
     const dtstart = toICSDate(event.date);
-    const dtend = nextDay(event.endDate || event.date);
-    const now = new Date().toISOString().replace(/[-:.]/g, '').slice(0, 15) + 'Z';
-
-    const descParts = [];
-    if (event.time)     descParts.push('Time: ' + event.time);
-    if (event.cost)     descParts.push('Cost: ' + event.cost);
-    if (event.description) descParts.push(event.description);
-    if (event.notes)    descParts.push('Note: ' + event.notes);
-
+    const dtend   = nextDay(event.endDate || event.date);
+    const now     = new Date().toISOString().replace(/[-:.]/g, '').slice(0, 15) + 'Z';
+    const parts   = [];
+    if (event.time)        parts.push('Time: ' + event.time);
+    if (event.cost)        parts.push('Cost: ' + event.cost);
+    if (event.description) parts.push(event.description);
+    if (event.notes)       parts.push('Note: ' + event.notes);
     const lines = [
-      'BEGIN:VCALENDAR',
-      'VERSION:2.0',
+      'BEGIN:VCALENDAR', 'VERSION:2.0',
       'PRODID:-//Valor Youth//Events Calendar//EN',
-      'CALSCALE:GREGORIAN',
-      'METHOD:PUBLISH',
+      'CALSCALE:GREGORIAN', 'METHOD:PUBLISH',
       'BEGIN:VEVENT',
       `UID:${event.id}@valoryouth`,
       `DTSTAMP:${now}`,
@@ -1112,15 +1216,13 @@
       `DTEND;VALUE=DATE:${dtend}`,
       `SUMMARY:${escapeICS(event.title)}`,
       event.location ? `LOCATION:${escapeICS(event.location)}` : null,
-      descParts.length ? `DESCRIPTION:${escapeICS(descParts.join('\\n'))}` : null,
-      'END:VEVENT',
-      'END:VCALENDAR'
+      parts.length ? `DESCRIPTION:${escapeICS(parts.join('\\n'))}` : null,
+      'END:VEVENT', 'END:VCALENDAR'
     ].filter(Boolean).join('\r\n');
-
     const blob = new Blob([lines], { type: 'text/calendar;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
     a.download = `${event.title.replace(/[^a-z0-9]/gi, '_')}.ics`;
     a.click();
     URL.revokeObjectURL(url);
@@ -1132,36 +1234,25 @@
   }
 
   document.getElementById('modalClose').addEventListener('click', closeModal);
-
   document.getElementById('modalBackdrop').addEventListener('click', e => {
     if (e.target === document.getElementById('modalBackdrop')) closeModal();
   });
 
   document.getElementById('prevBtn').addEventListener('click', () => {
-    currentMonth--;
-    if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+    if (--currentMonth < 0) { currentMonth = 11; currentYear--; }
     renderCalendar();
   });
-
   document.getElementById('nextBtn').addEventListener('click', () => {
-    currentMonth++;
-    if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+    if (++currentMonth > 11) { currentMonth = 0; currentYear++; }
     renderCalendar();
   });
-
+  document.getElementById('todayBtn').addEventListener('click', () => {
+    currentYear  = today.getFullYear();
+    currentMonth = today.getMonth();
+    renderCalendar();
+  });
 
   loadEvents();
 </script>
-
-<footer class="mobile-footer">
-  <a href="mailto:youth@valor.church" class="footer-link">
-    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"/></svg>
-    youth@valor.church
-  </a>
-  <a href="https://instagram.com/_valoryouth" target="_blank" rel="noopener" class="footer-link">
-    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 1.366.062 2.633.334 3.608 1.308.975.975 1.246 2.242 1.308 3.608.058 1.266.07 1.646.07 4.85s-.012 3.584-.07 4.85c-.062 1.366-.334 2.633-1.308 3.608-.975.975-2.242 1.246-3.608 1.308-1.266.058-1.646.07-4.85.07s-3.584-.012-4.85-.07c-1.366-.062-2.633-.334-3.608-1.308-.975-.975-1.246-2.242-1.308-3.608C2.175 15.584 2.163 15.204 2.163 12s.012-3.584.07-4.85c.062-1.366.334-2.633 1.308-3.608.975-.975 2.242-1.246 3.608-1.308 1.266-.058 1.646-.07 4.85-.07zm0-2.163c-3.259 0-3.667.014-4.947.072-1.613.074-3.067.418-4.205 1.557C1.709 2.768 1.365 4.222 1.291 5.835 1.233 7.115 1.219 7.523 1.219 12c0 4.477.014 4.885.072 6.165.074 1.613.418 3.067 1.557 4.205 1.138 1.139 2.592 1.483 4.205 1.557C8.333 23.986 8.741 24 12 24s3.667-.014 4.947-.072c1.613-.074 3.067-.418 4.205-1.557 1.139-1.138 1.483-2.592 1.557-4.205.058-1.28.072-1.688.072-6.165 0-4.477-.014-4.885-.072-6.165-.074-1.613-.418-3.067-1.557-4.205C19.014.49 17.56.146 15.947.072 14.667.014 14.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zm0 10.162a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
-    @_valoryouth
-  </a>
-</footer>
 </body>
 </html>

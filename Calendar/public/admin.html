@@ -3,21 +3,48 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Valor Youth Calendar - Staff</title>
+  <title>Valor Youth — Staff</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=PT+Serif:ital@0;1&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --black:    #000;
+      --burgundy: #4D3033;
+      --gold:     #9F936B;
+      --slate:    #3B4A50;
+      --cream:    #faf9f6;
+      --border:   #e8e4db;
+      --text:     #1a1a1a;
+      --muted:    #888;
+      --white:    #fff;
+      --danger:   #b91c1c;
+      --radius-sm: 6px;
+      --radius-md: 12px;
+      --radius-lg: 18px;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-md: 0 4px 16px rgba(0,0,0,0.09), 0 2px 6px rgba(0,0,0,0.05);
+      --shadow-lg: 0 16px 48px rgba(0,0,0,0.13), 0 4px 14px rgba(0,0,0,0.08);
+      --t: 0.18s ease;
+    }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: 'Segoe UI', system-ui, sans-serif;
-      background: #f5f4f0;
-      color: #1a1a1a;
+      font-family: 'PT Serif', Georgia, serif;
+      background: var(--cream);
+      color: var(--text);
       min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
 
+    /* ---- Header ---- */
     header {
-      background: #000;
-      color: #fff;
-      padding: 1.25rem 1.5rem;
+      background: var(--black);
+      color: var(--white);
+      padding: 0 2rem;
+      height: 68px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -25,194 +52,683 @@
       gap: 0.75rem;
     }
 
-    .header-left h1 { font-family: 'Segoe UI Black', 'Arial Black', sans-serif; font-size: 1.4rem; }
-    .header-left p { font-size: 0.8rem; color: #9F936B; margin-top: 0.2rem; text-transform: uppercase; letter-spacing: 0.05em; }
-    .header-right { display: flex; gap: 0.75rem; align-items: center; }
+    .header-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      text-decoration: none;
+      color: var(--white);
+    }
+    .header-logo img { width: 36px; height: 36px; object-fit: contain; }
+    .header-logo-text {
+      font-family: 'Archivo Black', sans-serif;
+      font-size: 1rem;
+      letter-spacing: 0.01em;
+      line-height: 1.1;
+    }
+    .header-logo-sub {
+      font-family: 'PT Serif', serif;
+      font-size: 0.67rem;
+      color: var(--gold);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      display: block;
+    }
 
-    .btn { padding: 0.5rem 1rem; border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer; border: none; transition: opacity 0.15s; }
-    .btn:hover { opacity: 0.85; }
-    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
-    .btn-primary { background: #9F936B; color: #000; }
-    .btn-danger  { background: #ef4444; color: #fff; }
-    .btn-ghost   { background: transparent; color: #9F936B; border: 1px solid #9F936B; }
-    .btn-sm      { padding: 0.3rem 0.65rem; font-size: 0.75rem; border-radius: 5px; }
+    .header-right { display: flex; gap: 0.65rem; align-items: center; }
 
+    /* ---- Buttons ---- */
+    .btn {
+      font-family: 'Archivo Black', sans-serif;
+      font-size: 0.72rem;
+      letter-spacing: 0.04em;
+      padding: 0.48rem 1.1rem;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      border: none;
+      transition: all var(--t);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      text-decoration: none;
+    }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; }
+
+    .btn-primary {
+      background: var(--slate);
+      color: var(--white);
+    }
+    .btn-primary:hover { background: #2d3a3f; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(59,74,80,0.28); }
+    .btn-primary:active { transform: translateY(0); box-shadow: none; }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--gold);
+      border: 1.5px solid rgba(159,147,107,0.5);
+    }
+    .btn-ghost:hover { border-color: var(--gold); background: rgba(159,147,107,0.08); }
+
+    .btn-ghost-dark {
+      background: transparent;
+      color: rgba(255,255,255,0.75);
+      border: 1.5px solid rgba(255,255,255,0.2);
+      font-family: 'PT Serif', serif;
+      font-size: 0.82rem;
+    }
+    .btn-ghost-dark:hover { border-color: rgba(255,255,255,0.5); color: var(--white); }
+
+    .btn-danger {
+      background: var(--danger);
+      color: var(--white);
+    }
+    .btn-danger:hover { background: #991b1b; transform: translateY(-1px); }
+
+    .btn-sm { padding: 0.3rem 0.7rem; font-size: 0.68rem; }
+
+    /* ---- Login screen ---- */
     #loginScreen {
-      display: flex; align-items: center; justify-content: center;
-      min-height: calc(100vh - 70px); padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: calc(100vh - 68px);
+      background: var(--black);
+    }
+
+    .login-hero {
+      width: 100%;
+      text-align: center;
+      padding: 3rem 1.5rem 0;
+      position: relative;
+    }
+    .login-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 0%, rgba(159,147,107,0.15) 0%, transparent 65%);
+      pointer-events: none;
+    }
+    .login-hero-divider {
+      width: 28px;
+      height: 2px;
+      background: var(--gold);
+      margin: 0.85rem auto 0;
+      border-radius: 1px;
+    }
+
+    .login-card-wrap {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      padding: 2.5rem 1.5rem 3rem;
     }
 
     .login-card {
-      background: #fff; border-radius: 12px; padding: 2rem;
-      width: 100%; max-width: 360px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      padding: 2.25rem 2rem;
+      width: 100%;
+      max-width: 360px;
+      box-shadow: var(--shadow-lg);
+      animation: slideUp 0.24s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    .login-card h2 { margin-bottom: 1.5rem; font-size: 1.1rem; }
-    .login-card label { display: block; font-size: 0.8rem; font-weight: 600; color: #555; margin-bottom: 0.4rem; text-transform: uppercase; letter-spacing: 0.04em; }
-    .login-card input { width: 100%; padding: 0.6rem 0.75rem; border: 1.5px solid #d1d5db; border-radius: 6px; font-size: 1rem; margin-bottom: 1rem; outline: none; transition: border-color 0.15s; }
-    .login-card input:focus { border-color: #4D3033; }
-    .login-error { color: #ef4444; font-size: 0.8rem; margin-bottom: 0.75rem; display: none; }
+    @keyframes slideUp {
+      from { transform: translateY(16px); opacity: 0; }
+      to   { transform: translateY(0);    opacity: 1; }
+    }
 
+    .login-card h2 {
+      font-family: 'Archivo Black', sans-serif;
+      font-size: 1.25rem;
+      margin-bottom: 1.6rem;
+      color: var(--black);
+    }
+    .login-card label {
+      display: block;
+      font-family: 'PT Serif', serif;
+      font-size: 0.68rem;
+      color: var(--gold);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 0.45rem;
+    }
+    .login-card input {
+      width: 100%;
+      padding: 0.65rem 0.85rem;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 1rem;
+      font-family: 'PT Serif', serif;
+      margin-bottom: 1rem;
+      outline: none;
+      transition: border-color var(--t), box-shadow var(--t);
+      background: var(--white);
+    }
+    .login-card input:focus {
+      border-color: var(--slate);
+      box-shadow: 0 0 0 3px rgba(59,74,80,0.1);
+    }
+    .login-error {
+      font-family: 'PT Serif', serif;
+      color: var(--danger);
+      font-size: 0.8rem;
+      margin-bottom: 0.75rem;
+      display: none;
+    }
+
+    /* ---- Admin app ---- */
     #adminApp { display: none; }
 
     .toolbar {
-      padding: 1rem 1.5rem; display: flex; align-items: center;
-      justify-content: space-between; flex-wrap: wrap; gap: 0.75rem;
-      border-bottom: 1px solid #e5e7eb; background: #fff;
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--white);
+      box-shadow: var(--shadow-sm);
     }
-    .toolbar-left { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+    .toolbar-left { display: flex; align-items: center; gap: 0.65rem; flex-wrap: wrap; }
 
-    select { padding: 0.45rem 0.75rem; border: 1.5px solid #d1d5db; border-radius: 6px; font-size: 0.85rem; outline: none; background: #fff; }
-    select:focus { border-color: #4D3033; }
+    .filter-select {
+      font-family: 'PT Serif', serif;
+      font-size: 0.82rem;
+      padding: 0.45rem 0.75rem;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      outline: none;
+      background: var(--white);
+      color: var(--text);
+      cursor: pointer;
+      transition: border-color var(--t);
+    }
+    .filter-select:focus { border-color: var(--slate); }
 
-    .event-list { padding: 1rem 1.5rem; max-width: 960px; margin: 0 auto; }
-    .event-list h2 { font-size: 1rem; color: #555; margin-bottom: 0.75rem; font-weight: 600; }
+    /* ---- Event list ---- */
+    .event-list {
+      padding: 1.25rem 2rem;
+      max-width: 980px;
+      margin: 0 auto;
+    }
+
+    .list-label {
+      font-family: 'PT Serif', serif;
+      font-size: 0.75rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.85rem;
+    }
 
     .event-row {
-      background: #fff; border-radius: 8px; padding: 0.85rem 1rem;
-      margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.75rem;
-      border: 1px solid #e5e7eb; cursor: pointer; transition: border-color 0.15s;
+      background: var(--white);
+      border-radius: var(--radius-sm);
+      padding: 0.9rem 1rem;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      border: 1.5px solid var(--border);
+      cursor: pointer;
+      transition: border-color var(--t), box-shadow var(--t), transform var(--t);
     }
-    .event-row:hover { border-color: #9F936B; }
-    .event-row-type { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-    .event-row-info { flex: 1; }
-    .event-row-title { font-weight: 600; font-size: 0.9rem; }
-    .event-row-meta { font-size: 0.75rem; color: #6b7280; margin-top: 2px; }
+    .event-row:hover {
+      border-color: rgba(159,147,107,0.55);
+      box-shadow: var(--shadow-md);
+      transform: translateY(-1px);
+    }
+    .event-row:active { transform: translateY(0); }
+
+    .event-row-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .event-row-info { flex: 1; min-width: 0; }
+    .event-row-title {
+      font-family: 'Archivo Black', sans-serif;
+      font-size: 0.88rem;
+      color: var(--black);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .event-row-meta {
+      font-family: 'PT Serif', serif;
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
     .event-row-actions { display: flex; gap: 0.5rem; align-items: center; flex-shrink: 0; }
 
     .rsvp-badge {
-      display: inline-flex; align-items: center; gap: 0.3rem;
-      font-size: 0.72rem; font-weight: 700; padding: 3px 8px; border-radius: 12px;
-      background: #fef3c7; color: #78350f; cursor: pointer; white-space: nowrap;
-      border: none; font-family: inherit; transition: background 0.15s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-family: 'PT Serif', serif;
+      font-size: 0.72rem;
+      padding: 3px 9px;
+      border-radius: 99px;
+      background: #fef3c7;
+      color: #78350f;
+      cursor: pointer;
+      white-space: nowrap;
+      border: none;
+      transition: background var(--t);
     }
     .rsvp-badge:hover { background: #fde68a; }
-    .rsvp-badge.no-rsvps { background: #f3f4f6; color: #9ca3af; }
+    .rsvp-badge.no-rsvps { background: #f3f2ee; color: var(--muted); }
 
-    .empty-state { text-align: center; padding: 3rem 1rem; color: #9ca3af; }
+    .empty-state {
+      text-align: center;
+      padding: 3.5rem 1rem;
+      font-family: 'PT Serif', serif;
+      color: var(--muted);
+      font-style: italic;
+    }
 
-    .dot-regular   { background: #3b82f6; }
-    .dot-outing    { background: #10b981; }
-    .dot-special   { background: #8b5cf6; }
-    .dot-camp      { background: #f97316; }
-    .dot-gospel    { background: #f59e0b; }
-    .dot-cancelled { background: #9ca3af; }
+    /* Type dot colors — Valor palette */
+    .dot-regular   { background: var(--slate); }
+    .dot-outing    { background: var(--gold); }
+    .dot-special   { background: var(--burgundy); }
+    .dot-camp      { background: var(--burgundy); }
+    .dot-gospel    { background: var(--gold); }
+    .dot-cancelled { background: #ccc; }
 
+    /* ---- Drawer backdrop ---- */
     .modal-backdrop {
-      display: none; position: fixed; inset: 0;
-      background: rgba(0,0,0,0.45); z-index: 100;
-      align-items: flex-start; justify-content: flex-end;
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      z-index: 100;
+      align-items: flex-start;
+      justify-content: flex-end;
+      backdrop-filter: blur(3px);
+      -webkit-backdrop-filter: blur(3px);
     }
-    .modal-backdrop.open { display: flex; }
+    .modal-backdrop.open {
+      display: flex;
+      animation: fadeIn 0.18s ease;
+    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
+    /* ---- Drawer ---- */
     .drawer {
-      background: #fff; width: 100%; max-width: 440px;
-      height: 100vh; overflow-y: auto; padding: 1.5rem;
-      display: flex; flex-direction: column; gap: 0.1rem;
+      background: var(--white);
+      width: 100%;
+      max-width: 440px;
+      height: 100vh;
+      overflow-y: auto;
+      padding: 1.75rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      box-shadow: -8px 0 32px rgba(0,0,0,0.12);
+      animation: drawerIn 0.26s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    .drawer h3 { font-size: 1.1rem; margin-bottom: 1.25rem; }
+    @keyframes drawerIn {
+      from { transform: translateX(100%); }
+      to   { transform: translateX(0); }
+    }
 
+    .drawer-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+    }
+    .drawer h3 {
+      font-family: 'Archivo Black', sans-serif;
+      font-size: 1.15rem;
+      color: var(--black);
+    }
+    .drawer-close {
+      background: #f2f0ec;
+      border: none;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      font-size: 1.05rem;
+      cursor: pointer;
+      color: #999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all var(--t);
+      line-height: 1;
+    }
+    .drawer-close:hover { background: #e6e2da; color: var(--black); }
+
+    /* ---- Form groups ---- */
     .form-group { margin-bottom: 1rem; }
     .form-group label {
-      display: block; font-size: 0.78rem; font-weight: 600; color: #555;
-      margin-bottom: 0.35rem; text-transform: uppercase; letter-spacing: 0.04em;
+      display: block;
+      font-family: 'PT Serif', serif;
+      font-size: 0.68rem;
+      color: var(--gold);
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      margin-bottom: 0.4rem;
+    }
+    .form-group label span {
+      font-size: 0.68rem;
+      color: var(--muted);
+      text-transform: none;
+      letter-spacing: 0;
     }
     .form-group input,
     .form-group select,
     .form-group textarea {
-      width: 100%; padding: 0.55rem 0.75rem; border: 1.5px solid #d1d5db;
-      border-radius: 6px; font-size: 0.9rem; font-family: inherit;
-      outline: none; transition: border-color 0.15s;
+      width: 100%;
+      padding: 0.6rem 0.85rem;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 0.9rem;
+      font-family: 'PT Serif', serif;
+      outline: none;
+      transition: border-color var(--t), box-shadow var(--t);
+      background: var(--white);
+      color: var(--text);
     }
     .form-group input:focus,
     .form-group select:focus,
-    .form-group textarea:focus { border-color: #4D3033; }
+    .form-group textarea:focus {
+      border-color: var(--slate);
+      box-shadow: 0 0 0 3px rgba(59,74,80,0.1);
+    }
     .form-group textarea { resize: vertical; min-height: 80px; }
 
     .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
 
-    .form-actions {
-      display: flex; gap: 0.75rem; margin-top: 1.25rem;
-      padding-top: 1.25rem; border-top: 1px solid #e5e7eb;
+    /* ---- Section dividers in drawer ---- */
+    .drawer-section {
+      border-top: 1px solid var(--border);
+      margin-top: 0.75rem;
+      padding-top: 1rem;
+      margin-bottom: 0.5rem;
+    }
+    .drawer-section-label {
+      font-family: 'PT Serif', serif;
+      font-size: 0.65rem;
+      font-weight: 400;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--gold);
+      margin-bottom: 0.85rem;
     }
 
-    /* RSVP toggles in form */
-    .rsvp-settings {
-      border-top: 1px solid #f0eeea; margin-top: 0.5rem;
-      padding-top: 1rem; margin-bottom: 0.5rem;
-    }
-    .rsvp-settings-label {
-      font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
-      letter-spacing: 0.06em; color: #9F936B; margin-bottom: 0.75rem;
-    }
+    /* ---- Toggle rows ---- */
     .toggle-row {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0.6rem 0; border-bottom: 1px solid #f3f4f6;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.65rem 0;
+      border-bottom: 1px solid #f3f1ec;
+      gap: 1rem;
     }
     .toggle-row:last-child { border-bottom: none; }
-    .toggle-row-text {}
-    .toggle-row-title { font-size: 0.85rem; font-weight: 600; color: #1a1a1a; }
-    .toggle-row-sub { font-size: 0.75rem; color: #6b7280; margin-top: 2px; }
+    .toggle-row-title {
+      font-family: 'PT Serif', serif;
+      font-size: 0.88rem;
+      color: var(--text);
+    }
+    .toggle-row-sub {
+      font-family: 'PT Serif', serif;
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
 
     .toggle { position: relative; display: inline-block; width: 40px; height: 22px; flex-shrink: 0; }
     .toggle input { opacity: 0; width: 0; height: 0; }
     .toggle-slider {
-      position: absolute; cursor: pointer; inset: 0;
-      background: #d1d5db; border-radius: 22px; transition: 0.2s;
+      position: absolute;
+      cursor: pointer;
+      inset: 0;
+      background: #d1cdc4;
+      border-radius: 22px;
+      transition: 0.2s;
     }
     .toggle-slider::before {
-      content: ''; position: absolute; height: 16px; width: 16px;
-      left: 3px; bottom: 3px; background: #fff; border-radius: 50%; transition: 0.2s;
+      content: '';
+      position: absolute;
+      height: 16px;
+      width: 16px;
+      left: 3px;
+      bottom: 3px;
+      background: var(--white);
+      border-radius: 50%;
+      transition: 0.2s;
+      box-shadow: var(--shadow-sm);
     }
-    .toggle input:checked + .toggle-slider { background: #4D3033; }
+    .toggle input:checked + .toggle-slider { background: var(--slate); }
     .toggle input:checked + .toggle-slider::before { transform: translateX(18px); }
 
+    /* ---- Form actions ---- */
+    .form-actions {
+      display: flex;
+      gap: 0.65rem;
+      margin-top: 1.5rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+
+    /* ---- Toast ---- */
     .toast {
-      position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%);
-      background: #1a1a1a; color: #fff; padding: 0.65rem 1.25rem;
-      border-radius: 8px; font-size: 0.85rem; z-index: 300;
-      opacity: 0; transition: opacity 0.2s; pointer-events: none;
+      position: fixed;
+      bottom: 1.75rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--black);
+      color: var(--white);
+      padding: 0.7rem 1.35rem;
+      border-radius: var(--radius-md);
+      font-family: 'PT Serif', serif;
+      font-size: 0.85rem;
+      z-index: 300;
+      opacity: 0;
+      transition: opacity 0.2s;
+      pointer-events: none;
+      white-space: nowrap;
+      box-shadow: var(--shadow-lg);
     }
     .toast.show { opacity: 1; }
 
-    /* RSVP Roster panel */
+    /* ---- Roster panel ---- */
     .roster-panel {
-      position: fixed; top: 0; right: 0; width: 100%; max-width: 500px;
-      height: 100vh; background: #fff;
-      box-shadow: -4px 0 24px rgba(0,0,0,0.14);
-      z-index: 200; display: none; flex-direction: column;
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 100%;
+      max-width: 480px;
+      height: 100vh;
+      background: var(--white);
+      box-shadow: -6px 0 32px rgba(0,0,0,0.12);
+      z-index: 200;
+      display: none;
+      flex-direction: column;
     }
     .roster-panel.open { display: flex; }
 
     .roster-header {
-      padding: 1.25rem 1.5rem; border-bottom: 1px solid #e5e7eb;
-      display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem;
+      padding: 1.4rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
       flex-shrink: 0;
+      background: var(--white);
     }
-    .roster-header-info h3 { font-size: 1rem; margin: 0 0 2px; }
-    .roster-header-info p { font-size: 0.8rem; color: #6b7280; margin: 0; }
+    .roster-header-info h3 {
+      font-family: 'Archivo Black', sans-serif;
+      font-size: 1rem;
+      color: var(--black);
+      margin-bottom: 2px;
+    }
+    .roster-header-info p {
+      font-family: 'PT Serif', serif;
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
     .roster-close {
-      background: none; border: none; font-size: 1.4rem; cursor: pointer;
-      color: #6b7280; line-height: 1; padding: 0; flex-shrink: 0;
+      background: #f2f0ec;
+      border: none;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      font-size: 1.05rem;
+      cursor: pointer;
+      color: #999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all var(--t);
+      flex-shrink: 0;
+      line-height: 1;
     }
-    .roster-body { flex: 1; overflow-y: auto; padding: 1.25rem 1.5rem; }
+    .roster-close:hover { background: #e6e2da; color: var(--black); }
 
-    .roster-count { font-size: 0.85rem; color: #6b7280; margin-bottom: 1rem; }
+    .roster-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.25rem 1.5rem;
+    }
+    .roster-count {
+      font-family: 'PT Serif', serif;
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-bottom: 1rem;
+    }
 
     .roster-card {
-      background: #f9f9f7; border: 1px solid #e5e7eb; border-radius: 8px;
-      padding: 0.85rem 1rem; margin-bottom: 0.6rem;
+      background: var(--cream);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0.9rem 1rem;
+      margin-bottom: 6px;
+      transition: border-color var(--t);
     }
-    .roster-card-student { font-weight: 700; font-size: 0.9rem; }
-    .roster-card-age { font-size: 0.78rem; color: #6b7280; margin-left: 0.4rem; font-weight: 400; }
-    .roster-card-parent { font-size: 0.82rem; color: #374151; margin-top: 0.35rem; }
-    .roster-card-contact { font-size: 0.78rem; color: #6b7280; margin-top: 0.2rem; }
-    .roster-card-contact a { color: #4D3033; text-decoration: none; }
+    .roster-card:hover { border-color: rgba(159,147,107,0.45); }
+
+    .roster-card-student {
+      font-family: 'Archivo Black', sans-serif;
+      font-size: 0.88rem;
+      color: var(--black);
+    }
+    .roster-card-age {
+      font-family: 'PT Serif', serif;
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-left: 0.4rem;
+      font-weight: 400;
+    }
+    .roster-card-parent {
+      font-family: 'PT Serif', serif;
+      font-size: 0.82rem;
+      color: #444;
+      margin-top: 0.35rem;
+    }
+    .roster-card-contact {
+      font-family: 'PT Serif', serif;
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 0.2rem;
+    }
+    .roster-card-contact a { color: var(--burgundy); text-decoration: none; }
     .roster-card-contact a:hover { text-decoration: underline; }
-    .roster-card-date { font-size: 0.7rem; color: #9ca3af; margin-top: 0.35rem; }
+    .roster-card-date {
+      font-family: 'PT Serif', serif;
+      font-size: 0.7rem;
+      color: #bbb;
+      margin-top: 0.35rem;
+      font-style: italic;
+    }
 
-    .roster-empty { text-align: center; color: #9ca3af; padding: 3rem 1rem; font-size: 0.9rem; }
+    .roster-empty {
+      text-align: center;
+      color: var(--muted);
+      padding: 3.5rem 1rem;
+      font-family: 'PT Serif', serif;
+      font-style: italic;
+    }
 
+    /* ---- Image upload ---- */
+    .image-preview-wrap { margin-bottom: 0.65rem; }
+    .image-preview-wrap img {
+      max-width: 100%;
+      max-height: 140px;
+      border-radius: var(--radius-sm);
+      object-fit: cover;
+      display: block;
+      border: 1px solid var(--border);
+    }
+    .remove-image-btn {
+      background: none;
+      border: none;
+      color: var(--danger);
+      font-family: 'PT Serif', serif;
+      font-size: 0.78rem;
+      cursor: pointer;
+      padding: 0.3rem 0;
+      display: block;
+      transition: opacity var(--t);
+    }
+    .remove-image-btn:hover { opacity: 0.7; }
+
+    /* Custom file input */
+    .file-input-wrap {
+      position: relative;
+    }
+    .file-input-wrap input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+    .file-input-label {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.62rem 0.85rem;
+      border: 1.5px dashed var(--border);
+      border-radius: var(--radius-sm);
+      font-family: 'PT Serif', serif;
+      font-size: 0.85rem;
+      color: var(--muted);
+      cursor: pointer;
+      transition: border-color var(--t), color var(--t);
+      background: var(--cream);
+    }
+    .file-input-wrap:hover .file-input-label {
+      border-color: var(--gold);
+      color: var(--text);
+    }
+    .file-input-label svg {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+      fill: currentColor;
+    }
+
+    /* Ensure form-row stays 2-col in drawer */
+    .drawer .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+    }
+
+    /* ---- Responsive ---- */
     @media (max-width: 600px) {
+      header { padding: 1rem; }
+      .toolbar { padding: 0.75rem 1rem; }
+      .event-list { padding: 1rem; }
       .drawer { max-width: 100%; }
       .form-row { grid-template-columns: 1fr; }
       .roster-panel { max-width: 100%; }
@@ -222,33 +738,43 @@
 <body>
 
 <header>
-  <div class="header-left">
-    <h1>Valor Youth</h1>
-    <p>Staff Calendar Editor</p>
-  </div>
+  <a href="/" class="header-logo">
+    <img src="/valor-mark.png" alt="Valor">
+    <div>
+      <div class="header-logo-text">Valor Youth</div>
+      <span class="header-logo-sub">Staff Editor</span>
+    </div>
+  </a>
   <div class="header-right">
-    <a href="/" class="btn btn-ghost">View Parent Calendar</a>
-    <button class="btn btn-ghost" id="logoutBtn">Logout</button>
+    <a href="/" class="btn btn-ghost-dark">View Calendar</a>
+    <button class="btn btn-ghost-dark" id="logoutBtn">Logout</button>
   </div>
 </header>
 
+<!-- Login -->
 <div id="loginScreen">
-  <div class="login-card">
-    <h2>Staff Login</h2>
-    <label for="passwordInput">Password</label>
-    <input type="password" id="passwordInput" placeholder="Enter staff password" autocomplete="current-password">
-    <div class="login-error" id="loginError">Incorrect password. Try again.</div>
-    <button class="btn btn-primary" id="loginBtn" style="width:100%">Login</button>
+  <div class="login-hero">
+    <div class="login-hero-divider"></div>
+  </div>
+  <div class="login-card-wrap">
+    <div class="login-card">
+      <h2>Staff Login</h2>
+      <label for="passwordInput">Password</label>
+      <input type="password" id="passwordInput" placeholder="Enter staff password" autocomplete="current-password">
+      <div class="login-error" id="loginError">Incorrect password. Try again.</div>
+      <button class="btn btn-primary" id="loginBtn" style="width:100%;justify-content:center;">Login</button>
+    </div>
   </div>
 </div>
 
+<!-- Admin app -->
 <div id="adminApp">
   <div class="toolbar">
     <div class="toolbar-left">
-      <select id="filterMonth">
+      <select class="filter-select" id="filterMonth">
         <option value="">All months</option>
       </select>
-      <select id="filterType">
+      <select class="filter-select" id="filterType">
         <option value="">All types</option>
         <option value="regular">Regular Youth</option>
         <option value="outing">Outing</option>
@@ -262,7 +788,7 @@
   </div>
 
   <div class="event-list">
-    <h2 id="listLabel">All events</h2>
+    <p class="list-label" id="listLabel">All events</p>
     <div id="eventListEl"></div>
   </div>
 </div>
@@ -270,7 +796,10 @@
 <!-- Event Drawer -->
 <div class="modal-backdrop" id="drawerBackdrop">
   <div class="drawer" id="drawer">
-    <h3 id="drawerTitle">Add Event</h3>
+    <div class="drawer-header">
+      <h3 id="drawerTitle">Add Event</h3>
+      <button class="drawer-close" id="cancelBtn">&times;</button>
+    </div>
 
     <div class="form-group">
       <label>Title</label>
@@ -295,7 +824,7 @@
         <input type="date" id="fDate">
       </div>
       <div class="form-group">
-        <label>End Date <span style="font-weight:400;text-transform:none">(multi-day)</span></label>
+        <label>End Date <span>(multi-day)</span></label>
         <input type="date" id="fEndDate">
       </div>
     </div>
@@ -322,28 +851,35 @@
     </div>
 
     <div class="form-group">
-      <label>Notes <span style="font-weight:400;text-transform:none">(shown in small print)</span></label>
+      <label>Notes <span>(shown in small print)</span></label>
       <input type="text" id="fNotes" placeholder="e.g. Bring a water bottle">
     </div>
 
     <div class="form-group">
       <label>Event Flyer / Image</label>
-      <div id="imagePreviewWrap" style="display:none;margin-bottom:0.6rem;">
-        <img id="imagePreview" src="" alt="" style="max-width:100%;max-height:150px;border-radius:6px;object-fit:cover;display:block;">
-        <button type="button" id="removeImageBtn" style="margin-top:0.35rem;background:none;border:none;color:#ef4444;font-size:0.78rem;cursor:pointer;padding:0;">&#10005; Remove image</button>
+      <div id="imagePreviewWrap" class="image-preview-wrap" style="display:none;">
+        <img id="imagePreview" src="" alt="">
+        <button type="button" class="remove-image-btn" id="removeImageBtn">&#10005; Remove image</button>
       </div>
-      <input type="file" id="fImageFile" accept="image/*" style="font-size:0.82rem;width:100%;cursor:pointer;">
+      <div class="file-input-wrap">
+        <input type="file" id="fImageFile" accept="image/*">
+        <label class="file-input-label" for="fImageFile">
+          <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+          Choose image file
+        </label>
+      </div>
       <input type="hidden" id="fImageUrl">
     </div>
 
-    <div class="rsvp-settings" style="border-top:1px solid #f0eeea;padding-top:1rem;">
-      <div class="rsvp-settings-label">Repeat</div>
+    <!-- Repeat -->
+    <div class="drawer-section" id="repeatSection">
+      <div class="drawer-section-label">Repeat</div>
       <div class="toggle-row">
-        <div class="toggle-row-text">
+        <div>
           <div class="toggle-row-title">Repeat event</div>
           <div class="toggle-row-sub">Auto-create multiple occurrences</div>
         </div>
-        <select id="fRepeat" style="font-size:0.82rem;padding:0.38rem 0.6rem;border:1.5px solid #d1d5db;border-radius:6px;outline:none;background:#fff;">
+        <select id="fRepeat" class="filter-select" style="font-size:0.82rem;">
           <option value="">No repeat</option>
           <option value="weekly">Every week</option>
           <option value="biweekly">Every 2 weeks</option>
@@ -351,52 +887,50 @@
         </select>
       </div>
       <div class="toggle-row" id="repeatUntilRow" style="display:none;">
-        <div class="toggle-row-text">
+        <div>
           <div class="toggle-row-title">Repeat until</div>
           <div class="toggle-row-sub">Last date to create an occurrence</div>
         </div>
-        <input type="date" id="fRepeatUntil" style="width:148px;padding:0.38rem 0.5rem;border:1.5px solid #d1d5db;border-radius:6px;font-size:0.82rem;outline:none;">
+        <input type="date" id="fRepeatUntil" style="width:148px;padding:0.42rem 0.55rem;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:0.82rem;outline:none;font-family:'PT Serif',serif;">
       </div>
     </div>
 
-    <div class="rsvp-settings">
-      <div class="rsvp-settings-label">RSVP Settings</div>
-
+    <!-- RSVP Settings -->
+    <div class="drawer-section">
+      <div class="drawer-section-label">RSVP Settings</div>
       <div class="toggle-row">
-        <div class="toggle-row-text">
+        <div>
           <div class="toggle-row-title">Enable RSVP</div>
-          <div class="toggle-row-sub">Show an RSVP form to parents on the calendar</div>
+          <div class="toggle-row-sub">Show an RSVP form to parents</div>
         </div>
         <label class="toggle">
           <input type="checkbox" id="fRsvpEnabled">
           <span class="toggle-slider"></span>
         </label>
       </div>
-
       <div class="toggle-row" id="requirePaymentRow">
-        <div class="toggle-row-text">
+        <div>
           <div class="toggle-row-title">Require Payment</div>
-          <div class="toggle-row-sub">Show "Pay Now" button after RSVP is submitted</div>
+          <div class="toggle-row-sub">Show "Pay Now" button after RSVP</div>
         </div>
         <label class="toggle">
           <input type="checkbox" id="fRequirePayment">
           <span class="toggle-slider"></span>
         </label>
       </div>
-
       <div class="toggle-row" id="capacityRow">
-        <div class="toggle-row-text">
+        <div>
           <div class="toggle-row-title">Max Spots</div>
-          <div class="toggle-row-sub">Leave blank for unlimited registrations</div>
+          <div class="toggle-row-sub">Leave blank for unlimited</div>
         </div>
-        <input type="number" id="fRsvpCapacity" min="1" placeholder="&#8734;" style="width:72px;text-align:center;padding:0.4rem 0.5rem;border:1.5px solid #d1d5db;border-radius:6px;font-size:0.9rem;outline:none;">
+        <input type="number" id="fRsvpCapacity" min="1" placeholder="&#8734;"
+          style="width:72px;text-align:center;padding:0.42rem 0.5rem;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:0.9rem;outline:none;font-family:'PT Serif',serif;">
       </div>
     </div>
 
     <div class="form-actions">
       <button class="btn btn-primary" id="saveBtn">Save</button>
-      <button class="btn btn-ghost" id="cancelBtn">Cancel</button>
-      <button type="button" class="btn btn-ghost btn-sm" id="copyLinkBtn" style="display:none">&#128279; Copy Link</button>
+      <button class="btn btn-ghost btn-sm" id="copyLinkBtn" style="display:none">&#128279; Copy Link</button>
       <button class="btn btn-danger btn-sm" id="deleteBtn" style="margin-left:auto;display:none">Delete</button>
     </div>
   </div>
@@ -424,10 +958,10 @@
     camp: 'Camp', gospel: 'Gospel Night', cancelled: 'No Youth'
   };
 
-  let token = sessionStorage.getItem('adminToken') || '';
-  let events = [];
+  let token    = sessionStorage.getItem('adminToken') || '';
+  let events   = [];
   let rsvpCounts = {};
-  let editingId = null;
+  let editingId  = null;
 
   if (token) showApp();
 
@@ -438,7 +972,8 @@
     const pw = document.getElementById('passwordInput').value;
     try {
       const res = await fetch('/api/auth', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ password: pw })
       });
       if (res.ok) {
@@ -479,25 +1014,22 @@
   }
 
   function populateMonthFilter() {
-    const sel = document.getElementById('filterMonth');
+    const sel     = document.getElementById('filterMonth');
     const current = sel.value;
-    const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-
+    const monthNames = ['January','February','March','April','May','June',
+                        'July','August','September','October','November','December'];
     const months = new Set();
     events.forEach(e => { if (e.date) months.add(e.date.slice(0, 7)); });
-
     const today = new Date();
     for (let i = 0; i < 36; i++) {
       const d = new Date(today.getFullYear(), today.getMonth() + i, 1);
       months.add(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`);
     }
-
     const sorted = [...months].sort();
     sel.innerHTML = '<option value="">All months</option>';
     sorted.forEach(m => {
       const [yr, mo] = m.split('-');
-      const label = `${monthNames[parseInt(mo) - 1]} ${yr}`;
-      sel.innerHTML += `<option value="${m}"${m === current ? ' selected' : ''}>${label}</option>`;
+      sel.innerHTML += `<option value="${m}"${m === current ? ' selected' : ''}>${monthNames[parseInt(mo)-1]} ${yr}</option>`;
     });
   }
 
@@ -536,18 +1068,15 @@
 
     el.innerHTML = '';
     filtered.forEach(event => {
-      const count = rsvpCounts[event.id] || 0;
+      const count        = rsvpCounts[event.id] || 0;
       const showRsvpBadge = event.rsvpEnabled;
-      const cap = event.rsvpCapacity;
-      const spotsLabel = cap
-        ? (count >= cap ? ' &middot; FULL' : ` &middot; ${cap - count} left`)
-        : '';
+      const cap          = event.rsvpCapacity;
+      const spotsLabel   = cap ? (count >= cap ? ' &middot; FULL' : ` &middot; ${cap - count} left`) : '';
 
       const row = document.createElement('div');
       row.className = 'event-row';
-
       row.innerHTML = `
-        <div class="event-row-type dot-${event.type}"></div>
+        <div class="event-row-dot dot-${event.type}"></div>
         <div class="event-row-info">
           <div class="event-row-title">${event.title}</div>
           <div class="event-row-meta">${formatDate(event.date, event.endDate)}${event.time ? ' &middot; ' + event.time : ''}${event.location ? ' &middot; ' + event.location : ''}</div>
@@ -558,17 +1087,11 @@
         </div>
       `;
 
-      row.querySelector('.edit-btn').addEventListener('click', e => {
-        e.stopPropagation();
-        openDrawer(event.id);
-      });
+      row.querySelector('.edit-btn').addEventListener('click', e => { e.stopPropagation(); openDrawer(event.id); });
       row.addEventListener('click', () => openDrawer(event.id));
 
       if (showRsvpBadge) {
-        row.querySelector('.rsvp-badge').addEventListener('click', e => {
-          e.stopPropagation();
-          openRoster(event);
-        });
+        row.querySelector('.rsvp-badge').addEventListener('click', e => { e.stopPropagation(); openRoster(event); });
       }
 
       el.appendChild(row);
@@ -577,7 +1100,7 @@
 
   function formatDate(dateStr, endDateStr) {
     const opts = { month: 'short', day: 'numeric', year: 'numeric' };
-    const d = new Date(dateStr + 'T12:00:00');
+    const d    = new Date(dateStr + 'T12:00:00');
     if (endDateStr) {
       const end = new Date(endDateStr + 'T12:00:00');
       return `${d.toLocaleDateString('en-US', opts)} - ${end.toLocaleDateString('en-US', opts)}`;
@@ -617,7 +1140,7 @@
 
   document.getElementById('removeImageBtn').addEventListener('click', () => {
     document.getElementById('fImageFile').value = '';
-    document.getElementById('fImageUrl').value = '';
+    document.getElementById('fImageUrl').value  = '';
     document.getElementById('imagePreviewWrap').style.display = 'none';
   });
 
@@ -632,27 +1155,26 @@
 
     if (id) {
       const event = events.find(e => e.id === id);
-      document.getElementById('drawerTitle').textContent = 'Edit Event';
-      document.getElementById('fTitle').value       = event.title || '';
-      document.getElementById('fType').value        = event.type || 'regular';
-      document.getElementById('fDate').value        = event.date || '';
-      document.getElementById('fEndDate').value     = event.endDate || '';
-      document.getElementById('fTime').value        = event.time || '';
-      document.getElementById('fCost').value        = event.cost || '';
-      document.getElementById('fLocation').value    = event.location || '';
-      document.getElementById('fDescription').value = event.description || '';
-      document.getElementById('fNotes').value       = event.notes || '';
+      document.getElementById('drawerTitle').textContent  = 'Edit Event';
+      document.getElementById('fTitle').value             = event.title || '';
+      document.getElementById('fType').value              = event.type || 'regular';
+      document.getElementById('fDate').value              = event.date || '';
+      document.getElementById('fEndDate').value           = event.endDate || '';
+      document.getElementById('fTime').value              = event.time || '';
+      document.getElementById('fCost').value              = event.cost || '';
+      document.getElementById('fLocation').value          = event.location || '';
+      document.getElementById('fDescription').value       = event.description || '';
+      document.getElementById('fNotes').value             = event.notes || '';
 
       const rsvpEnabled = !!event.rsvpEnabled;
-      document.getElementById('fRsvpEnabled').checked    = rsvpEnabled;
-      document.getElementById('fRequirePayment').checked = event.requirePayment !== false;
-      document.getElementById('fRequirePayment').disabled = !rsvpEnabled;
+      document.getElementById('fRsvpEnabled').checked       = rsvpEnabled;
+      document.getElementById('fRequirePayment').checked    = event.requirePayment !== false;
+      document.getElementById('fRequirePayment').disabled   = !rsvpEnabled;
       document.getElementById('requirePaymentRow').style.opacity = rsvpEnabled ? '1' : '0.4';
-      document.getElementById('fRsvpCapacity').value = event.rsvpCapacity || '';
-      document.getElementById('fRsvpCapacity').disabled = !rsvpEnabled;
-      document.getElementById('capacityRow').style.opacity = rsvpEnabled ? '1' : '0.4';
+      document.getElementById('fRsvpCapacity').value        = event.rsvpCapacity || '';
+      document.getElementById('fRsvpCapacity').disabled     = !rsvpEnabled;
+      document.getElementById('capacityRow').style.opacity  = rsvpEnabled ? '1' : '0.4';
 
-      // Image
       document.getElementById('fImageFile').value = '';
       document.getElementById('fImageUrl').value  = event.imageUrl || '';
       if (event.imageUrl) {
@@ -662,46 +1184,38 @@
         document.getElementById('imagePreviewWrap').style.display = 'none';
       }
 
-      // Repeat (hide when editing — only for new events)
       document.getElementById('fRepeat').value = '';
       document.getElementById('repeatUntilRow').style.display = 'none';
       document.getElementById('fRepeatUntil').value = '';
-      document.getElementById('fRepeat').closest('.rsvp-settings').style.display = 'none';
+      document.getElementById('repeatSection').style.display = 'none';
 
-      // Copy Link
       document.getElementById('copyLinkBtn').style.display = '';
       deleteBtn.style.display = 'block';
     } else {
-      document.getElementById('drawerTitle').textContent = 'Add Event';
-      document.getElementById('fTitle').value       = '';
-      document.getElementById('fType').value        = 'regular';
-      document.getElementById('fDate').value        = '';
-      document.getElementById('fEndDate').value     = '';
-      document.getElementById('fTime').value        = '6:30-8PM';
-      document.getElementById('fCost').value        = '';
-      document.getElementById('fLocation').value    = 'Excel Academy';
-      document.getElementById('fDescription').value = '';
-      document.getElementById('fNotes').value       = '';
-      document.getElementById('fRsvpEnabled').checked    = false;
-      document.getElementById('fRequirePayment').checked = true;
+      document.getElementById('drawerTitle').textContent  = 'Add Event';
+      document.getElementById('fTitle').value             = '';
+      document.getElementById('fType').value              = 'regular';
+      document.getElementById('fDate').value              = '';
+      document.getElementById('fEndDate').value           = '';
+      document.getElementById('fTime').value              = '6:30-8PM';
+      document.getElementById('fCost').value              = '';
+      document.getElementById('fLocation').value          = 'Excel Academy';
+      document.getElementById('fDescription').value       = '';
+      document.getElementById('fNotes').value             = '';
+      document.getElementById('fRsvpEnabled').checked     = false;
+      document.getElementById('fRequirePayment').checked  = true;
       document.getElementById('fRequirePayment').disabled = true;
       document.getElementById('requirePaymentRow').style.opacity = '0.4';
-      document.getElementById('fRsvpCapacity').value = '';
-      document.getElementById('fRsvpCapacity').disabled = true;
+      document.getElementById('fRsvpCapacity').value      = '';
+      document.getElementById('fRsvpCapacity').disabled   = true;
       document.getElementById('capacityRow').style.opacity = '0.4';
-
-      // Image
-      document.getElementById('fImageFile').value = '';
-      document.getElementById('fImageUrl').value  = '';
+      document.getElementById('fImageFile').value         = '';
+      document.getElementById('fImageUrl').value          = '';
       document.getElementById('imagePreviewWrap').style.display = 'none';
-
-      // Repeat (show for new events)
-      document.getElementById('fRepeat').value = '';
+      document.getElementById('fRepeat').value            = '';
       document.getElementById('repeatUntilRow').style.display = 'none';
-      document.getElementById('fRepeatUntil').value = '';
-      document.getElementById('fRepeat').closest('.rsvp-settings').style.display = '';
-
-      // Copy Link
+      document.getElementById('fRepeatUntil').value       = '';
+      document.getElementById('repeatSection').style.display = '';
       document.getElementById('copyLinkBtn').style.display = 'none';
       deleteBtn.style.display = 'none';
     }
@@ -727,18 +1241,18 @@
       notes:          document.getElementById('fNotes').value.trim(),
       rsvpEnabled:    document.getElementById('fRsvpEnabled').checked,
       requirePayment: document.getElementById('fRequirePayment').checked,
-      rsvpCapacity:   document.getElementById('fRsvpCapacity').value ? parseInt(document.getElementById('fRsvpCapacity').value, 10) : null,
+      rsvpCapacity:   document.getElementById('fRsvpCapacity').value
+                        ? parseInt(document.getElementById('fRsvpCapacity').value, 10) : null,
       imageUrl:       document.getElementById('fImageUrl').value || null
     };
 
     if (!basePayload.title || !basePayload.date) { showToast('Title and date are required.'); return; }
 
     const saveBtn = document.getElementById('saveBtn');
-    saveBtn.disabled = true;
+    saveBtn.disabled    = true;
     saveBtn.textContent = 'Saving…';
 
     try {
-      // Upload image if a new file was selected
       const fileInput = document.getElementById('fImageFile');
       if (fileInput.files.length > 0) {
         const formData = new FormData();
@@ -751,9 +1265,9 @@
       }
 
       if (editingId) {
-        // ── Edit existing event ──
         const res = await fetch(`/api/events/${editingId}`, {
-          method: 'PUT', headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
           body: JSON.stringify(basePayload)
         });
         if (!res.ok) throw new Error('Save failed');
@@ -761,35 +1275,29 @@
         closeDrawer();
         loadAll();
       } else {
-        // ── Create new event(s) ──
         const repeatType  = document.getElementById('fRepeat').value;
         const repeatUntil = document.getElementById('fRepeatUntil').value;
 
         if (repeatType && repeatUntil) {
-          // Generate all occurrences
-          const seriesId = Date.now().toString(36);
+          const seriesId   = Date.now().toString(36);
           const occurrences = [];
-          const until = new Date(repeatUntil + 'T12:00:00');
-          let current = new Date(basePayload.date + 'T12:00:00');
+          const until      = new Date(repeatUntil + 'T12:00:00');
+          let current      = new Date(basePayload.date + 'T12:00:00');
 
           while (current <= until) {
-            occurrences.push({
-              ...basePayload,
-              date: current.toISOString().slice(0, 10),
-              endDate: null,
-              seriesId
-            });
-            if (repeatType === 'weekly')   current.setDate(current.getDate() + 7);
+            occurrences.push({ ...basePayload, date: current.toISOString().slice(0, 10), endDate: null, seriesId });
+            if (repeatType === 'weekly')    current.setDate(current.getDate() + 7);
             else if (repeatType === 'biweekly') current.setDate(current.getDate() + 14);
             else if (repeatType === 'monthly')  current.setMonth(current.getMonth() + 1);
           }
 
-          if (occurrences.length === 0) { showToast('No occurrences in range.'); return; }
+          if (!occurrences.length) { showToast('No occurrences in range.'); return; }
 
           let saved = 0;
           for (const occ of occurrences) {
             const r = await fetch('/api/events', {
-              method: 'POST', headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
               body: JSON.stringify(occ)
             });
             if (r.ok) saved++;
@@ -797,7 +1305,8 @@
           showToast(`${saved} event${saved !== 1 ? 's' : ''} added.`);
         } else {
           const res = await fetch('/api/events', {
-            method: 'POST', headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
             body: JSON.stringify(basePayload)
           });
           if (!res.ok) throw new Error('Save failed');
@@ -807,9 +1316,9 @@
         loadAll();
       }
     } catch (err) {
-      showToast(err.message || 'Something went wrong. Try again.');
+      showToast(err.message || 'Something went wrong.');
     } finally {
-      saveBtn.disabled = false;
+      saveBtn.disabled    = false;
       saveBtn.textContent = 'Save';
     }
   });
@@ -838,11 +1347,10 @@
   async function openRoster(event) {
     rosterCurrentEvent = event;
     rosterCurrentRsvps = [];
-    document.getElementById('rosterTitle').textContent = event.title;
-    const capNote = event.rsvpCapacity ? ` &middot; ${event.rsvpCapacity} max` : '';
+    document.getElementById('rosterTitle').textContent    = event.title;
     document.getElementById('rosterSubtitle').textContent = formatDate(event.date, event.endDate);
-    document.getElementById('rosterCapNote').innerHTML = capNote;
-    document.getElementById('rosterBody').innerHTML = '<div class="roster-empty">Loading&hellip;</div>';
+    document.getElementById('rosterCapNote').innerHTML    = event.rsvpCapacity ? ` &middot; ${event.rsvpCapacity} max` : '';
+    document.getElementById('rosterBody').innerHTML       = '<div class="roster-empty">Loading&hellip;</div>';
     document.getElementById('rosterPanel').classList.add('open');
 
     try {
@@ -856,12 +1364,12 @@
 
   function renderRoster() {
     const rsvps = rosterCurrentRsvps;
-    if (rsvps.length === 0) {
+    if (!rsvps.length) {
       document.getElementById('rosterBody').innerHTML = '<div class="roster-empty">No RSVPs yet for this event.</div>';
       return;
     }
 
-    const cap = rosterCurrentEvent.rsvpCapacity;
+    const cap       = rosterCurrentEvent.rsvpCapacity;
     const spotsText = cap ? ` of ${cap}` : '';
 
     const cards = rsvps.map(r => {
@@ -878,7 +1386,10 @@
               </div>
               <div class="roster-card-date">Registered ${submitted}</div>
             </div>
-            <button onclick="deleteRsvp('${r.id}')" style="background:none;border:none;color:#9ca3af;cursor:pointer;font-size:1rem;padding:0;flex-shrink:0;" title="Remove RSVP">&times;</button>
+            <button onclick="deleteRsvp('${r.id}')"
+              style="background:none;border:none;color:#ccc;cursor:pointer;font-size:1.1rem;padding:0;flex-shrink:0;transition:color 0.15s;"
+              onmouseover="this.style.color='#b91c1c'" onmouseout="this.style.color='#ccc'"
+              title="Remove RSVP">&times;</button>
           </div>
         </div>
       `;
@@ -887,7 +1398,7 @@
     document.getElementById('rosterBody').innerHTML = `
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;gap:0.5rem;flex-wrap:wrap;">
         <p class="roster-count" style="margin:0;">${rsvps.length}${spotsText} registration${rsvps.length !== 1 ? 's' : ''}</p>
-        <button class="btn btn-ghost btn-sm" onclick="downloadCSV()">&#8681; Download CSV</button>
+        <button class="btn btn-ghost btn-sm" onclick="downloadCSV()">&#8681; CSV</button>
       </div>
       ${cards}
     `;
@@ -912,18 +1423,16 @@
     const event = rosterCurrentEvent;
     const rsvps = rosterCurrentRsvps;
     if (!rsvps.length) return;
-
-    const headers = ['Student Name', 'Age', 'Parent Name', 'Phone', 'Email', 'Registered'];
-    const rows = rsvps.map(r => [
+    const headers = ['Student Name','Age','Parent Name','Phone','Email','Registered'];
+    const rows    = rsvps.map(r => [
       r.studentName, r.studentAge, r.parentName, r.phone, r.email,
       new Date(r.submittedAt).toLocaleDateString('en-US')
     ].map(v => `"${String(v).replace(/"/g, '""')}"`).join(','));
-
-    const csv = [headers.join(','), ...rows].join('\n');
+    const csv  = [headers.join(','), ...rows].join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
     a.download = `RSVPs - ${event.title} (${event.date}).csv`;
     a.click();
     URL.revokeObjectURL(url);
