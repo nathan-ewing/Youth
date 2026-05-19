@@ -760,7 +760,10 @@
         <option value="cancelled">No Youth</option>
       </select>
     </div>
-    <button class="btn btn-primary" id="addEventBtn">+ Add Event</button>
+    <div style="display:flex;gap:0.5rem;align-items:center;">
+      <button class="btn btn-ghost btn-sm" id="exportAllBtn" title="Download all RSVPs as CSV">&#8681; Export RSVPs</button>
+      <button class="btn btn-primary" id="addEventBtn">+ Add Event</button>
+    </div>
   </div>
 
   <div class="event-list">
@@ -1413,6 +1416,38 @@
     a.click();
     URL.revokeObjectURL(url);
   }
+
+  document.getElementById('exportAllBtn').addEventListener('click', async () => {
+    try {
+      const res = await fetch('/api/rsvps', { headers: { 'x-admin-token': token } });
+      if (!res.ok) { showToast('Could not load RSVPs.'); return; }
+      const allRsvps = await res.json();
+      if (!allRsvps.length) { showToast('No RSVPs to export.'); return; }
+
+      const eventMap = {};
+      events.forEach(e => { eventMap[e.id] = e; });
+
+      const headers = ['Event','Event Date','Student Name','Age','Parent Name','Phone','Email','Registered'];
+      const rows = allRsvps.map(r => {
+        const evt = eventMap[r.eventId] || {};
+        return [
+          evt.title || r.eventId,
+          evt.date  || '',
+          r.studentName, r.studentAge, r.parentName, r.phone, r.email,
+          new Date(r.submittedAt).toLocaleDateString('en-US')
+        ].map(v => `"${String(v ?? '').replace(/"/g, '""')}"`).join(',');
+      });
+
+      const csv  = [headers.join(','), ...rows].join('\n');
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement('a');
+      a.href     = url;
+      a.download = `Valor Youth RSVPs - All Events.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch { showToast('Export failed.'); }
+  });
 
   function showToast(msg) {
     const t = document.getElementById('toast');
