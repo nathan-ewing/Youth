@@ -18,7 +18,7 @@ const uploadStorage = multer.diskStorage({
 const upload = multer({ storage: uploadStorage, limits: { fileSize: 8 * 1024 * 1024 } });
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3000;
 const EVENTS_FILE = path.join(__dirname, 'data', 'events.json');
 const RSVPS_FILE  = path.join(__dirname, 'data', 'rsvps.json');
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'valor2026';
@@ -81,8 +81,16 @@ app.post('/api/rsvp', async (req, res) => {
   const event = events.find(e => e.id === eventId);
   if (!event) return res.status(404).json({ error: 'Event not found.' });
 
+  const existingRsvps = readRsvps();
+
+  // Prevent duplicate RSVP from same email for same event
+  const duplicate = existingRsvps.find(r => r.eventId === eventId && r.email.toLowerCase() === email.toLowerCase());
+  if (duplicate) {
+    return res.status(400).json({ error: 'This email is already registered for this event.' });
+  }
+
   if (event.rsvpCapacity) {
-    const currentCount = readRsvps().filter(r => r.eventId === eventId).length;
+    const currentCount = existingRsvps.filter(r => r.eventId === eventId).length;
     if (currentCount >= event.rsvpCapacity) {
       return res.status(400).json({ error: 'Sorry, this event is full.' });
     }
@@ -156,13 +164,15 @@ app.post('/api/rsvp', async (req, res) => {
       </div>`
   };
 
+  // Respond immediately — RSVP is saved. Email is best-effort.
+  res.json({ ok: true });
+
   try {
+    const transporter = createTransporter();
     await transporter.sendMail(staffMail);
     await transporter.sendMail(parentMail);
-    res.json({ ok: true });
   } catch (err) {
-    console.error('Email error:', err.message);
-    res.status(500).json({ error: 'Failed to send email. Please try again.' });
+    console.error('Email error (RSVP still saved):', err.message);
   }
 });
 
