@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Valor Youth Calendar - Staff</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #f5f4f0;
+      color: #1a1a1a;
+      min-height: 100vh;
+    }
+
+    header {
+      background: #000;
+      color: #fff;
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .header-left h1 { font-family: 'Segoe UI Black', 'Arial Black', sans-serif; font-size: 1.4rem; }
+    .header-left p { font-size: 0.8rem; color: #9F936B; margin-top: 0.2rem; text-transform: uppercase; letter-spacing: 0.05em; }
+    .header-right { display: flex; gap: 0.75rem; align-items: center; }
+
+    .btn { padding: 0.5rem 1rem; border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer; border: none; transition: opacity 0.15s; }
+    .btn:hover { opacity: 0.85; }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-primary { background: #9F936B; color: #000; }
+    .btn-danger  { background: #ef4444; color: #fff; }
+    .btn-ghost   { background: transparent; color: #9F936B; border: 1px solid #9F936B; }
+    .btn-sm      { padding: 0.3rem 0.65rem; font-size: 0.75rem; border-radius: 5px; }
+
+    #loginScreen {
+      display: flex; align-items: center; justify-content: center;
+      min-height: calc(100vh - 70px); padding: 2rem;
+    }
+
+    .login-card {
+      background: #fff; border-radius: 12px; padding: 2rem;
+      width: 100%; max-width: 360px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+    .login-card h2 { margin-bottom: 1.5rem; font-size: 1.1rem; }
+    .login-card label { display: block; font-size: 0.8rem; font-weight: 600; color: #555; margin-bottom: 0.4rem; text-transform: uppercase; letter-spacing: 0.04em; }
+    .login-card input { width: 100%; padding: 0.6rem 0.75rem; border: 1.5px solid #d1d5db; border-radius: 6px; font-size: 1rem; margin-bottom: 1rem; outline: none; transition: border-color 0.15s; }
+    .login-card input:focus { border-color: #4D3033; }
+    .login-error { color: #ef4444; font-size: 0.8rem; margin-bottom: 0.75rem; display: none; }
+
+    #adminApp { display: none; }
+
+    .toolbar {
+      padding: 1rem 1.5rem; display: flex; align-items: center;
+      justify-content: space-between; flex-wrap: wrap; gap: 0.75rem;
+      border-bottom: 1px solid #e5e7eb; background: #fff;
+    }
+    .toolbar-left { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+
+    select { padding: 0.45rem 0.75rem; border: 1.5px solid #d1d5db; border-radius: 6px; font-size: 0.85rem; outline: none; background: #fff; }
+    select:focus { border-color: #4D3033; }
+
+    .event-list { padding: 1rem 1.5rem; max-width: 960px; margin: 0 auto; }
+    .event-list h2 { font-size: 1rem; color: #555; margin-bottom: 0.75rem; font-weight: 600; }
+
+    .event-row {
+      background: #fff; border-radius: 8px; padding: 0.85rem 1rem;
+      margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.75rem;
+      border: 1px solid #e5e7eb; cursor: pointer; transition: border-color 0.15s;
+    }
+    .event-row:hover { border-color: #9F936B; }
+    .event-row-type { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .event-row-info { flex: 1; }
+    .event-row-title { font-weight: 600; font-size: 0.9rem; }
+    .event-row-meta { font-size: 0.75rem; color: #6b7280; margin-top: 2px; }
+    .event-row-actions { display: flex; gap: 0.5rem; align-items: center; flex-shrink: 0; }
+
+    .rsvp-badge {
+      display: inline-flex; align-items: center; gap: 0.3rem;
+      font-size: 0.72rem; font-weight: 700; padding: 3px 8px; border-radius: 12px;
+      background: #fef3c7; color: #78350f; cursor: pointer; white-space: nowrap;
+      border: none; font-family: inherit; transition: background 0.15s;
+    }
+    .rsvp-badge:hover { background: #fde68a; }
+    .rsvp-badge.no-rsvps { background: #f3f4f6; color: #9ca3af; }
+
+    .empty-state { text-align: center; padding: 3rem 1rem; color: #9ca3af; }
+
+    .dot-regular   { background: #3b82f6; }
+    .dot-outing    { background: #10b981; }
+    .dot-special   { background: #8b5cf6; }
+    .dot-camp      { background: #f97316; }
+    .dot-gospel    { background: #f59e0b; }
+    .dot-cancelled { background: #9ca3af; }
+
+    .modal-backdrop {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.45); z-index: 100;
+      align-items: flex-start; justify-content: flex-end;
+    }
+    .modal-backdrop.open { display: flex; }
+
+    .drawer {
+      background: #fff; width: 100%; max-width: 440px;
+      height: 100vh; overflow-y: auto; padding: 1.5rem;
+      display: flex; flex-direction: column; gap: 0.1rem;
+    }
+    .drawer h3 { font-size: 1.1rem; margin-bottom: 1.25rem; }
+
+    .form-group { margin-bottom: 1rem; }
+    .form-group label {
+      display: block; font-size: 0.78rem; font-weight: 600; color: #555;
+      margin-bottom: 0.35rem; text-transform: uppercase; letter-spacing: 0.04em;
+    }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%; padding: 0.55rem 0.75rem; border: 1.5px solid #d1d5db;
+      border-radius: 6px; font-size: 0.9rem; font-family: inherit;
+      outline: none; transition: border-color 0.15s;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus { border-color: #4D3033; }
+    .form-group textarea { resize: vertical; min-height: 80px; }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+
+    .form-actions {
+      display: flex; gap: 0.75rem; margin-top: 1.25rem;
+      padding-top: 1.25rem; border-top: 1px solid #e5e7eb;
+    }
+
+    /* RSVP toggles in form */
+    .rsvp-settings {
+      border-top: 1px solid #f0eeea; margin-top: 0.5rem;
+      padding-top: 1rem; margin-bottom: 0.5rem;
+    }
+    .rsvp-settings-label {
+      font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.06em; color: #9F936B; margin-bottom: 0.75rem;
+    }
+    .toggle-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0.6rem 0; border-bottom: 1px solid #f3f4f6;
+    }
+    .toggle-row:last-child { border-bottom: none; }
+    .toggle-row-text {}
+    .toggle-row-title { font-size: 0.85rem; font-weight: 600; color: #1a1a1a; }
+    .toggle-row-sub { font-size: 0.75rem; color: #6b7280; margin-top: 2px; }
+
+    .toggle { position: relative; display: inline-block; width: 40px; height: 22px; flex-shrink: 0; }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider {
+      position: absolute; cursor: pointer; inset: 0;
+      background: #d1d5db; border-radius: 22px; transition: 0.2s;
+    }
+    .toggle-slider::before {
+      content: ''; position: absolute; height: 16px; width: 16px;
+      left: 3px; bottom: 3px; background: #fff; border-radius: 50%; transition: 0.2s;
+    }
+    .toggle input:checked + .toggle-slider { background: #4D3033; }
+    .toggle input:checked + .toggle-slider::before { transform: translateX(18px); }
+
+    .toast {
+      position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%);
+      background: #1a1a1a; color: #fff; padding: 0.65rem 1.25rem;
+      border-radius: 8px; font-size: 0.85rem; z-index: 300;
+      opacity: 0; transition: opacity 0.2s; pointer-events: none;
+    }
+    .toast.show { opacity: 1; }
+
+    /* RSVP Roster panel */
+    .roster-panel {
+      position: fixed; top: 0; right: 0; width: 100%; max-width: 500px;
+      height: 100vh; background: #fff;
+      box-shadow: -4px 0 24px rgba(0,0,0,0.14);
+      z-index: 200; display: none; flex-direction: column;
+    }
+    .roster-panel.open { display: flex; }
+
+    .roster-header {
+      padding: 1.25rem 1.5rem; border-bottom: 1px solid #e5e7eb;
+      display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem;
+      flex-shrink: 0;
+    }
+    .roster-header-info h3 { font-size: 1rem; margin: 0 0 2px; }
+    .roster-header-info p { font-size: 0.8rem; color: #6b7280; margin: 0; }
+    .roster-close {
+      background: none; border: none; font-size: 1.4rem; cursor: pointer;
+      color: #6b7280; line-height: 1; padding: 0; flex-shrink: 0;
+    }
+    .roster-body { flex: 1; overflow-y: auto; padding: 1.25rem 1.5rem; }
+
+    .roster-count { font-size: 0.85rem; color: #6b7280; margin-bottom: 1rem; }
+
+    .roster-card {
+      background: #f9f9f7; border: 1px solid #e5e7eb; border-radius: 8px;
+      padding: 0.85rem 1rem; margin-bottom: 0.6rem;
+    }
+    .roster-card-student { font-weight: 700; font-size: 0.9rem; }
+    .roster-card-age { font-size: 0.78rem; color: #6b7280; margin-left: 0.4rem; font-weight: 400; }
+    .roster-card-parent { font-size: 0.82rem; color: #374151; margin-top: 0.35rem; }
+    .roster-card-contact { font-size: 0.78rem; color: #6b7280; margin-top: 0.2rem; }
+    .roster-card-contact a { color: #4D3033; text-decoration: none; }
+    .roster-card-contact a:hover { text-decoration: underline; }
+    .roster-card-date { font-size: 0.7rem; color: #9ca3af; margin-top: 0.35rem; }
+
+    .roster-empty { text-align: center; color: #9ca3af; padding: 3rem 1rem; font-size: 0.9rem; }
+
+    @media (max-width: 600px) {
+      .drawer { max-width: 100%; }
+      .form-row { grid-template-columns: 1fr; }
+      .roster-panel { max-width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <h1>Valor Youth</h1>
+    <p>Staff Calendar Editor</p>
+  </div>
+  <div class="header-right">
+    <a href="/" class="btn btn-ghost">View Parent Calendar</a>
+    <button class="btn btn-ghost" id="logoutBtn">Logout</button>
+  </div>
+</header>
+
+<div id="loginScreen">
+  <div class="login-card">
+    <h2>Staff Login</h2>
+    <label for="passwordInput">Password</label>
+    <input type="password" id="passwordInput" placeholder="Enter staff password" autocomplete="current-password">
+    <div class="login-error" id="loginError">Incorrect password. Try again.</div>
+    <button class="btn btn-primary" id="loginBtn" style="width:100%">Login</button>
+  </div>
+</div>
+
+<div id="adminApp">
+  <div class="toolbar">
+    <div class="toolbar-left">
+      <select id="filterMonth">
+        <option value="">All months</option>
+      </select>
+      <select id="filterType">
+        <option value="">All types</option>
+        <option value="regular">Regular Youth</option>
+        <option value="outing">Outing</option>
+        <option value="special">Special Event</option>
+        <option value="camp">Camp</option>
+        <option value="gospel">Gospel Night</option>
+        <option value="cancelled">No Youth</option>
+      </select>
+    </div>
+    <button class="btn btn-primary" id="addEventBtn">+ Add Event</button>
+  </div>
+
+  <div class="event-list">
+    <h2 id="listLabel">All events</h2>
+    <div id="eventListEl"></div>
+  </div>
+</div>
+
+<!-- Event Drawer -->
+<div class="modal-backdrop" id="drawerBackdrop">
+  <div class="drawer" id="drawer">
+    <h3 id="drawerTitle">Add Event</h3>
+
+    <div class="form-group">
+      <label>Title</label>
+      <input type="text" id="fTitle" placeholder="Event title">
+    </div>
+
+    <div class="form-group">
+      <label>Type</label>
+      <select id="fType">
+        <option value="regular">Regular Youth</option>
+        <option value="outing">Outing</option>
+        <option value="special">Special Event</option>
+        <option value="camp">Camp</option>
+        <option value="gospel">Gospel Night</option>
+        <option value="cancelled">No Youth</option>
+      </select>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Date</label>
+        <input type="date" id="fDate">
+      </div>
+      <div class="form-group">
+        <label>End Date <span style="font-weight:400;text-transform:none">(multi-day)</span></label>
+        <input type="date" id="fEndDate">
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Time</label>
+        <input type="text" id="fTime" placeholder="e.g. 6:30-8PM">
+      </div>
+      <div class="form-group">
+        <label>Cost</label>
+        <input type="text" id="fCost" placeholder="e.g. $20">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Location</label>
+      <input type="text" id="fLocation" placeholder="e.g. Excel Academy">
+    </div>
+
+    <div class="form-group">
+      <label>Description</label>
+      <textarea id="fDescription" placeholder="What parents need to know..."></textarea>
+    </div>
+
+    <div class="form-group">
+      <label>Notes <span style="font-weight:400;text-transform:none">(shown in small print)</span></label>
+      <input type="text" id="fNotes" placeholder="e.g. Bring a water bottle">
+    </div>
+
+    <div class="form-group">
+      <label>Event Flyer / Image</label>
+      <div id="imagePreviewWrap" style="display:none;margin-bottom:0.6rem;">
+        <img id="imagePreview" src="" alt="" style="max-width:100%;max-height:150px;border-radius:6px;object-fit:cover;display:block;">
+        <button type="button" id="removeImageBtn" style="margin-top:0.35rem;background:none;border:none;color:#ef4444;font-size:0.78rem;cursor:pointer;padding:0;">&#10005; Remove image</button>
+      </div>
+      <input type="file" id="fImageFile" accept="image/*" style="font-size:0.82rem;width:100%;cursor:pointer;">
+      <input type="hidden" id="fImageUrl">
+    </div>
+
+    <div class="rsvp-settings" style="border-top:1px solid #f0eeea;padding-top:1rem;">
+      <div class="rsvp-settings-label">Repeat</div>
+      <div class="toggle-row">
+        <div class="toggle-row-text">
+          <div class="toggle-row-title">Repeat event</div>
+          <div class="toggle-row-sub">Auto-create multiple occurrences</div>
+        </div>
+        <select id="fRepeat" style="font-size:0.82rem;padding:0.38rem 0.6rem;border:1.5px solid #d1d5db;border-radius:6px;outline:none;background:#fff;">
+          <option value="">No repeat</option>
+          <option value="weekly">Every week</option>
+          <option value="biweekly">Every 2 weeks</option>
+          <option value="monthly">Every month</option>
+        </select>
+      </div>
+      <div class="toggle-row" id="repeatUntilRow" style="display:none;">
+        <div class="toggle-row-text">
+          <div class="toggle-row-title">Repeat until</div>
+          <div class="toggle-row-sub">Last date to create an occurrence</div>
+        </div>
+        <input type="date" id="fRepeatUntil" style="width:148px;padding:0.38rem 0.5rem;border:1.5px solid #d1d5db;border-radius:6px;font-size:0.82rem;outline:none;">
+      </div>
+    </div>
+
+    <div class="rsvp-settings">
+      <div class="rsvp-settings-label">RSVP Settings</div>
+
+      <div class="toggle-row">
+        <div class="toggle-row-text">
+          <div class="toggle-row-title">Enable RSVP</div>
+          <div class="toggle-row-sub">Show an RSVP form to parents on the calendar</div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="fRsvpEnabled">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
+      <div class="toggle-row" id="requirePaymentRow">
+        <div class="toggle-row-text">
+          <div class="toggle-row-title">Require Payment</div>
+          <div class="toggle-row-sub">Show "Pay Now" button after RSVP is submitted</div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="fRequirePayment">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
+      <div class="toggle-row" id="capacityRow">
+        <div class="toggle-row-text">
+          <div class="toggle-row-title">Max Spots</div>
+          <div class="toggle-row-sub">Leave blank for unlimited registrations</div>
+        </div>
+        <input type="number" id="fRsvpCapacity" min="1" placeholder="&#8734;" style="width:72px;text-align:center;padding:0.4rem 0.5rem;border:1.5px solid #d1d5db;border-radius:6px;font-size:0.9rem;outline:none;">
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button class="btn btn-primary" id="saveBtn">Save</button>
+      <button class="btn btn-ghost" id="cancelBtn">Cancel</button>
+      <button type="button" class="btn btn-ghost btn-sm" id="copyLinkBtn" style="display:none">&#128279; Copy Link</button>
+      <button class="btn btn-danger btn-sm" id="deleteBtn" style="margin-left:auto;display:none">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- RSVP Roster Panel -->
+<div class="roster-panel" id="rosterPanel">
+  <div class="roster-header">
+    <div class="roster-header-info">
+      <h3 id="rosterTitle">RSVPs</h3>
+      <p id="rosterSubtitle"><span id="rosterCapNote"></span></p>
+    </div>
+    <button class="roster-close" id="rosterClose">&times;</button>
+  </div>
+  <div class="roster-body" id="rosterBody">
+    <div class="roster-empty">Loading&hellip;</div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const TYPE_LABELS = {
+    regular: 'Regular Youth', outing: 'Outing', special: 'Special Event',
+    camp: 'Camp', gospel: 'Gospel Night', cancelled: 'No Youth'
+  };
+
+  let token = sessionStorage.getItem('adminToken') || '';
+  let events = [];
+  let rsvpCounts = {};
+  let editingId = null;
+
+  if (token) showApp();
+
+  document.getElementById('loginBtn').addEventListener('click', login);
+  document.getElementById('passwordInput').addEventListener('keydown', e => { if (e.key === 'Enter') login(); });
+
+  async function login() {
+    const pw = document.getElementById('passwordInput').value;
+    try {
+      const res = await fetch('/api/auth', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: pw })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        token = data.token;
+        sessionStorage.setItem('adminToken', token);
+        showApp();
+      } else {
+        document.getElementById('loginError').style.display = 'block';
+      }
+    } catch {
+      document.getElementById('loginError').style.display = 'block';
+    }
+  }
+
+  function showApp() {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('adminApp').style.display = 'block';
+    loadAll();
+  }
+
+  document.getElementById('logoutBtn').addEventListener('click', () => {
+    sessionStorage.removeItem('adminToken');
+    token = '';
+    document.getElementById('loginScreen').style.display = 'flex';
+    document.getElementById('adminApp').style.display = 'none';
+  });
+
+  async function loadAll() {
+    await Promise.all([loadEvents(), loadRsvpCounts()]);
+  }
+
+  async function loadEvents() {
+    const res = await fetch('/api/events');
+    events = await res.json();
+    populateMonthFilter();
+    renderList();
+  }
+
+  function populateMonthFilter() {
+    const sel = document.getElementById('filterMonth');
+    const current = sel.value;
+    const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+    const months = new Set();
+    events.forEach(e => { if (e.date) months.add(e.date.slice(0, 7)); });
+
+    const today = new Date();
+    for (let i = 0; i < 36; i++) {
+      const d = new Date(today.getFullYear(), today.getMonth() + i, 1);
+      months.add(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`);
+    }
+
+    const sorted = [...months].sort();
+    sel.innerHTML = '<option value="">All months</option>';
+    sorted.forEach(m => {
+      const [yr, mo] = m.split('-');
+      const label = `${monthNames[parseInt(mo) - 1]} ${yr}`;
+      sel.innerHTML += `<option value="${m}"${m === current ? ' selected' : ''}>${label}</option>`;
+    });
+  }
+
+  async function loadRsvpCounts() {
+    try {
+      const res = await fetch('/api/rsvps', { headers: { 'x-admin-token': token } });
+      if (!res.ok) return;
+      const rsvps = await res.json();
+      rsvpCounts = {};
+      rsvps.forEach(r => { rsvpCounts[r.eventId] = (rsvpCounts[r.eventId] || 0) + 1; });
+      renderList();
+    } catch {}
+  }
+
+  document.getElementById('filterMonth').addEventListener('change', renderList);
+  document.getElementById('filterType').addEventListener('change', renderList);
+
+  function renderList() {
+    const month = document.getElementById('filterMonth').value;
+    const type  = document.getElementById('filterType').value;
+
+    let filtered = [...events].sort((a, b) => a.date.localeCompare(b.date));
+    if (month) filtered = filtered.filter(e => e.date.startsWith(month));
+    if (type)  filtered = filtered.filter(e => e.type === type);
+
+    const label = document.getElementById('listLabel');
+    label.textContent = filtered.length === events.length
+      ? `All events (${events.length})`
+      : `${filtered.length} of ${events.length} events`;
+
+    const el = document.getElementById('eventListEl');
+    if (filtered.length === 0) {
+      el.innerHTML = '<div class="empty-state">No events match the current filter.</div>';
+      return;
+    }
+
+    el.innerHTML = '';
+    filtered.forEach(event => {
+      const count = rsvpCounts[event.id] || 0;
+      const showRsvpBadge = event.rsvpEnabled;
+      const cap = event.rsvpCapacity;
+      const spotsLabel = cap
+        ? (count >= cap ? ' &middot; FULL' : ` &middot; ${cap - count} left`)
+        : '';
+
+      const row = document.createElement('div');
+      row.className = 'event-row';
+
+      row.innerHTML = `
+        <div class="event-row-type dot-${event.type}"></div>
+        <div class="event-row-info">
+          <div class="event-row-title">${event.title}</div>
+          <div class="event-row-meta">${formatDate(event.date, event.endDate)}${event.time ? ' &middot; ' + event.time : ''}${event.location ? ' &middot; ' + event.location : ''}</div>
+        </div>
+        <div class="event-row-actions">
+          ${showRsvpBadge ? `<button class="rsvp-badge${count === 0 ? ' no-rsvps' : ''}" data-id="${event.id}">&#128203; ${count} RSVP${count !== 1 ? 's' : ''}${spotsLabel}</button>` : ''}
+          <button class="btn btn-ghost btn-sm edit-btn">Edit</button>
+        </div>
+      `;
+
+      row.querySelector('.edit-btn').addEventListener('click', e => {
+        e.stopPropagation();
+        openDrawer(event.id);
+      });
+      row.addEventListener('click', () => openDrawer(event.id));
+
+      if (showRsvpBadge) {
+        row.querySelector('.rsvp-badge').addEventListener('click', e => {
+          e.stopPropagation();
+          openRoster(event);
+        });
+      }
+
+      el.appendChild(row);
+    });
+  }
+
+  function formatDate(dateStr, endDateStr) {
+    const opts = { month: 'short', day: 'numeric', year: 'numeric' };
+    const d = new Date(dateStr + 'T12:00:00');
+    if (endDateStr) {
+      const end = new Date(endDateStr + 'T12:00:00');
+      return `${d.toLocaleDateString('en-US', opts)} - ${end.toLocaleDateString('en-US', opts)}`;
+    }
+    return d.toLocaleDateString('en-US', opts);
+  }
+
+  // ── Drawer ──────────────────────────────────────────────────
+  document.getElementById('addEventBtn').addEventListener('click', () => openDrawer(null));
+  document.getElementById('cancelBtn').addEventListener('click', closeDrawer);
+  document.getElementById('drawerBackdrop').addEventListener('click', e => {
+    if (e.target === document.getElementById('drawerBackdrop')) closeDrawer();
+  });
+
+  document.getElementById('fRsvpEnabled').addEventListener('change', function () {
+    const on = this.checked;
+    document.getElementById('requirePaymentRow').style.opacity = on ? '1' : '0.4';
+    document.getElementById('fRequirePayment').disabled = !on;
+    document.getElementById('capacityRow').style.opacity = on ? '1' : '0.4';
+    document.getElementById('fRsvpCapacity').disabled = !on;
+  });
+
+  document.getElementById('fRepeat').addEventListener('change', function () {
+    document.getElementById('repeatUntilRow').style.display = this.value ? '' : 'none';
+  });
+
+  document.getElementById('fImageFile').addEventListener('change', function () {
+    if (this.files.length > 0) {
+      const reader = new FileReader();
+      reader.onload = e => {
+        document.getElementById('imagePreview').src = e.target.result;
+        document.getElementById('imagePreviewWrap').style.display = '';
+      };
+      reader.readAsDataURL(this.files[0]);
+    }
+  });
+
+  document.getElementById('removeImageBtn').addEventListener('click', () => {
+    document.getElementById('fImageFile').value = '';
+    document.getElementById('fImageUrl').value = '';
+    document.getElementById('imagePreviewWrap').style.display = 'none';
+  });
+
+  document.getElementById('copyLinkBtn').addEventListener('click', () => {
+    const url = `${location.origin}/?event=${editingId}`;
+    navigator.clipboard.writeText(url).then(() => showToast('Link copied!'));
+  });
+
+  function openDrawer(id) {
+    editingId = id;
+    const deleteBtn = document.getElementById('deleteBtn');
+
+    if (id) {
+      const event = events.find(e => e.id === id);
+      document.getElementById('drawerTitle').textContent = 'Edit Event';
+      document.getElementById('fTitle').value       = event.title || '';
+      document.getElementById('fType').value        = event.type || 'regular';
+      document.getElementById('fDate').value        = event.date || '';
+      document.getElementById('fEndDate').value     = event.endDate || '';
+      document.getElementById('fTime').value        = event.time || '';
+      document.getElementById('fCost').value        = event.cost || '';
+      document.getElementById('fLocation').value    = event.location || '';
+      document.getElementById('fDescription').value = event.description || '';
+      document.getElementById('fNotes').value       = event.notes || '';
+
+      const rsvpEnabled = !!event.rsvpEnabled;
+      document.getElementById('fRsvpEnabled').checked    = rsvpEnabled;
+      document.getElementById('fRequirePayment').checked = event.requirePayment !== false;
+      document.getElementById('fRequirePayment').disabled = !rsvpEnabled;
+      document.getElementById('requirePaymentRow').style.opacity = rsvpEnabled ? '1' : '0.4';
+      document.getElementById('fRsvpCapacity').value = event.rsvpCapacity || '';
+      document.getElementById('fRsvpCapacity').disabled = !rsvpEnabled;
+      document.getElementById('capacityRow').style.opacity = rsvpEnabled ? '1' : '0.4';
+
+      // Image
+      document.getElementById('fImageFile').value = '';
+      document.getElementById('fImageUrl').value  = event.imageUrl || '';
+      if (event.imageUrl) {
+        document.getElementById('imagePreview').src = event.imageUrl;
+        document.getElementById('imagePreviewWrap').style.display = '';
+      } else {
+        document.getElementById('imagePreviewWrap').style.display = 'none';
+      }
+
+      // Repeat (hide when editing — only for new events)
+      document.getElementById('fRepeat').value = '';
+      document.getElementById('repeatUntilRow').style.display = 'none';
+      document.getElementById('fRepeatUntil').value = '';
+      document.getElementById('fRepeat').closest('.rsvp-settings').style.display = 'none';
+
+      // Copy Link
+      document.getElementById('copyLinkBtn').style.display = '';
+      deleteBtn.style.display = 'block';
+    } else {
+      document.getElementById('drawerTitle').textContent = 'Add Event';
+      document.getElementById('fTitle').value       = '';
+      document.getElementById('fType').value        = 'regular';
+      document.getElementById('fDate').value        = '';
+      document.getElementById('fEndDate').value     = '';
+      document.getElementById('fTime').value        = '6:30-8PM';
+      document.getElementById('fCost').value        = '';
+      document.getElementById('fLocation').value    = 'Excel Academy';
+      document.getElementById('fDescription').value = '';
+      document.getElementById('fNotes').value       = '';
+      document.getElementById('fRsvpEnabled').checked    = false;
+      document.getElementById('fRequirePayment').checked = true;
+      document.getElementById('fRequirePayment').disabled = true;
+      document.getElementById('requirePaymentRow').style.opacity = '0.4';
+      document.getElementById('fRsvpCapacity').value = '';
+      document.getElementById('fRsvpCapacity').disabled = true;
+      document.getElementById('capacityRow').style.opacity = '0.4';
+
+      // Image
+      document.getElementById('fImageFile').value = '';
+      document.getElementById('fImageUrl').value  = '';
+      document.getElementById('imagePreviewWrap').style.display = 'none';
+
+      // Repeat (show for new events)
+      document.getElementById('fRepeat').value = '';
+      document.getElementById('repeatUntilRow').style.display = 'none';
+      document.getElementById('fRepeatUntil').value = '';
+      document.getElementById('fRepeat').closest('.rsvp-settings').style.display = '';
+
+      // Copy Link
+      document.getElementById('copyLinkBtn').style.display = 'none';
+      deleteBtn.style.display = 'none';
+    }
+
+    document.getElementById('drawerBackdrop').classList.add('open');
+  }
+
+  function closeDrawer() {
+    document.getElementById('drawerBackdrop').classList.remove('open');
+    editingId = null;
+  }
+
+  document.getElementById('saveBtn').addEventListener('click', async () => {
+    const basePayload = {
+      title:          document.getElementById('fTitle').value.trim(),
+      type:           document.getElementById('fType').value,
+      date:           document.getElementById('fDate').value,
+      endDate:        document.getElementById('fEndDate').value || null,
+      time:           document.getElementById('fTime').value.trim(),
+      cost:           document.getElementById('fCost').value.trim(),
+      location:       document.getElementById('fLocation').value.trim(),
+      description:    document.getElementById('fDescription').value.trim(),
+      notes:          document.getElementById('fNotes').value.trim(),
+      rsvpEnabled:    document.getElementById('fRsvpEnabled').checked,
+      requirePayment: document.getElementById('fRequirePayment').checked,
+      rsvpCapacity:   document.getElementById('fRsvpCapacity').value ? parseInt(document.getElementById('fRsvpCapacity').value, 10) : null,
+      imageUrl:       document.getElementById('fImageUrl').value || null
+    };
+
+    if (!basePayload.title || !basePayload.date) { showToast('Title and date are required.'); return; }
+
+    const saveBtn = document.getElementById('saveBtn');
+    saveBtn.disabled = true;
+    saveBtn.textContent = 'Saving…';
+
+    try {
+      // Upload image if a new file was selected
+      const fileInput = document.getElementById('fImageFile');
+      if (fileInput.files.length > 0) {
+        const formData = new FormData();
+        formData.append('image', fileInput.files[0]);
+        const uploadRes = await fetch('/api/upload', {
+          method: 'POST', headers: { 'x-admin-token': token }, body: formData
+        });
+        if (!uploadRes.ok) throw new Error('Image upload failed');
+        basePayload.imageUrl = (await uploadRes.json()).url;
+      }
+
+      if (editingId) {
+        // ── Edit existing event ──
+        const res = await fetch(`/api/events/${editingId}`, {
+          method: 'PUT', headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
+          body: JSON.stringify(basePayload)
+        });
+        if (!res.ok) throw new Error('Save failed');
+        showToast('Event updated.');
+        closeDrawer();
+        loadAll();
+      } else {
+        // ── Create new event(s) ──
+        const repeatType  = document.getElementById('fRepeat').value;
+        const repeatUntil = document.getElementById('fRepeatUntil').value;
+
+        if (repeatType && repeatUntil) {
+          // Generate all occurrences
+          const seriesId = Date.now().toString(36);
+          const occurrences = [];
+          const until = new Date(repeatUntil + 'T12:00:00');
+          let current = new Date(basePayload.date + 'T12:00:00');
+
+          while (current <= until) {
+            occurrences.push({
+              ...basePayload,
+              date: current.toISOString().slice(0, 10),
+              endDate: null,
+              seriesId
+            });
+            if (repeatType === 'weekly')   current.setDate(current.getDate() + 7);
+            else if (repeatType === 'biweekly') current.setDate(current.getDate() + 14);
+            else if (repeatType === 'monthly')  current.setMonth(current.getMonth() + 1);
+          }
+
+          if (occurrences.length === 0) { showToast('No occurrences in range.'); return; }
+
+          let saved = 0;
+          for (const occ of occurrences) {
+            const r = await fetch('/api/events', {
+              method: 'POST', headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
+              body: JSON.stringify(occ)
+            });
+            if (r.ok) saved++;
+          }
+          showToast(`${saved} event${saved !== 1 ? 's' : ''} added.`);
+        } else {
+          const res = await fetch('/api/events', {
+            method: 'POST', headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
+            body: JSON.stringify(basePayload)
+          });
+          if (!res.ok) throw new Error('Save failed');
+          showToast('Event added.');
+        }
+        closeDrawer();
+        loadAll();
+      }
+    } catch (err) {
+      showToast(err.message || 'Something went wrong. Try again.');
+    } finally {
+      saveBtn.disabled = false;
+      saveBtn.textContent = 'Save';
+    }
+  });
+
+  document.getElementById('deleteBtn').addEventListener('click', async () => {
+    if (!confirm('Delete this event? This cannot be undone.')) return;
+    try {
+      const res = await fetch(`/api/events/${editingId}`, {
+        method: 'DELETE', headers: { 'x-admin-token': token }
+      });
+      if (!res.ok) throw new Error('Delete failed');
+      showToast('Event deleted.');
+      closeDrawer();
+      loadAll();
+    } catch { showToast('Something went wrong.'); }
+  });
+
+  // ── RSVP Roster ─────────────────────────────────────────────
+  document.getElementById('rosterClose').addEventListener('click', () => {
+    document.getElementById('rosterPanel').classList.remove('open');
+  });
+
+  let rosterCurrentEvent = null;
+  let rosterCurrentRsvps = [];
+
+  async function openRoster(event) {
+    rosterCurrentEvent = event;
+    rosterCurrentRsvps = [];
+    document.getElementById('rosterTitle').textContent = event.title;
+    const capNote = event.rsvpCapacity ? ` &middot; ${event.rsvpCapacity} max` : '';
+    document.getElementById('rosterSubtitle').textContent = formatDate(event.date, event.endDate);
+    document.getElementById('rosterCapNote').innerHTML = capNote;
+    document.getElementById('rosterBody').innerHTML = '<div class="roster-empty">Loading&hellip;</div>';
+    document.getElementById('rosterPanel').classList.add('open');
+
+    try {
+      const res = await fetch(`/api/rsvps/${event.id}`, { headers: { 'x-admin-token': token } });
+      rosterCurrentRsvps = await res.json();
+      renderRoster();
+    } catch {
+      document.getElementById('rosterBody').innerHTML = '<div class="roster-empty">Failed to load RSVPs.</div>';
+    }
+  }
+
+  function renderRoster() {
+    const rsvps = rosterCurrentRsvps;
+    if (rsvps.length === 0) {
+      document.getElementById('rosterBody').innerHTML = '<div class="roster-empty">No RSVPs yet for this event.</div>';
+      return;
+    }
+
+    const cap = rosterCurrentEvent.rsvpCapacity;
+    const spotsText = cap ? ` of ${cap}` : '';
+
+    const cards = rsvps.map(r => {
+      const submitted = new Date(r.submittedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      return `
+        <div class="roster-card" id="card-${r.id}">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:0.5rem;">
+            <div>
+              <div class="roster-card-student">${r.studentName}<span class="roster-card-age">Age ${r.studentAge}</span></div>
+              <div class="roster-card-parent">Parent: ${r.parentName}</div>
+              <div class="roster-card-contact">
+                <a href="tel:${r.phone}">${r.phone}</a> &middot;
+                <a href="mailto:${r.email}">${r.email}</a>
+              </div>
+              <div class="roster-card-date">Registered ${submitted}</div>
+            </div>
+            <button onclick="deleteRsvp('${r.id}')" style="background:none;border:none;color:#9ca3af;cursor:pointer;font-size:1rem;padding:0;flex-shrink:0;" title="Remove RSVP">&times;</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    document.getElementById('rosterBody').innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;gap:0.5rem;flex-wrap:wrap;">
+        <p class="roster-count" style="margin:0;">${rsvps.length}${spotsText} registration${rsvps.length !== 1 ? 's' : ''}</p>
+        <button class="btn btn-ghost btn-sm" onclick="downloadCSV()">&#8681; Download CSV</button>
+      </div>
+      ${cards}
+    `;
+  }
+
+  async function deleteRsvp(rsvpId) {
+    if (!confirm('Remove this RSVP? This cannot be undone.')) return;
+    try {
+      const res = await fetch(`/api/rsvps/${rsvpId}`, {
+        method: 'DELETE', headers: { 'x-admin-token': token }
+      });
+      if (!res.ok) throw new Error();
+      rosterCurrentRsvps = rosterCurrentRsvps.filter(r => r.id !== rsvpId);
+      if (rosterCurrentEvent) rsvpCounts[rosterCurrentEvent.id] = rosterCurrentRsvps.length;
+      renderRoster();
+      renderList();
+      showToast('RSVP removed.');
+    } catch { showToast('Could not remove RSVP.'); }
+  }
+
+  function downloadCSV() {
+    const event = rosterCurrentEvent;
+    const rsvps = rosterCurrentRsvps;
+    if (!rsvps.length) return;
+
+    const headers = ['Student Name', 'Age', 'Parent Name', 'Phone', 'Email', 'Registered'];
+    const rows = rsvps.map(r => [
+      r.studentName, r.studentAge, r.parentName, r.phone, r.email,
+      new Date(r.submittedAt).toLocaleDateString('en-US')
+    ].map(v => `"${String(v).replace(/"/g, '""')}"`).join(','));
+
+    const csv = [headers.join(','), ...rows].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `RSVPs - ${event.title} (${event.date}).csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+</script>
+</body>
+</html>

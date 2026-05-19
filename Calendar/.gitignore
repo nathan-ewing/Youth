@@ -1,0 +1,6 @@
+.DS_Store
+.cache/
+*.tar.gz
+*.zip
+node_modules/
+attached_assets/

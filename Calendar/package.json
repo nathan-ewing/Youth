@@ -1,0 +1,14 @@
+{
+  "name": "valor-youth-calendar",
+  "version": "1.0.0",
+  "description": "Valor Church Youth Events Calendar",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.22.2",
+    "multer": "^2.1.1",
+    "nodemailer": "^8.0.7"
+  }
+}

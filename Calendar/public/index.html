@@ -1,0 +1,1167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Valor Youth Events Calendar</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=PT+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'PT Serif', Georgia, serif;
+      background: #fff;
+      color: #1a1a1a;
+      min-height: 100vh;
+    }
+
+    /* ---- Header ---- */
+    header {
+      background: #fff;
+      border-bottom: 1px solid #e5e3dc;
+      padding: 0 2rem;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .header-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      text-decoration: none;
+      color: #000;
+    }
+
+    .header-logo svg { width: 32px; height: 32px; }
+
+    .header-logo-text {
+      font-family: 'Archivo Black', sans-serif;
+      font-size: 1rem;
+      letter-spacing: 0.01em;
+      line-height: 1.1;
+    }
+
+    .header-logo-sub {
+      font-family: 'PT Serif', serif;
+      font-size: 0.7rem;
+      color: #9F936B;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      display: block;
+    }
+
+    .header-links {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .header-link {
+      font-family: 'PT Serif', serif;
+      font-size: 0.85rem;
+      color: #333;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      transition: color 0.15s;
+    }
+    .header-link:hover { color: #000; }
+    .header-link svg { width: 15px; height: 15px; fill: currentColor; flex-shrink: 0; }
+
+    .admin-link {
+      font-family: 'PT Serif', serif;
+      font-size: 0.8rem;
+      color: #fff;
+      background: #3B4A50;
+      text-decoration: none;
+      padding: 0.4rem 1rem;
+      border-radius: 4px;
+      transition: background 0.15s;
+      letter-spacing: 0.01em;
+    }
+    .admin-link:hover { background: #2d3a3f; }
+
+    /* ---- Page title band ---- */
+    .page-title-band {
+      background: #000;
+      color: #fff;
+      text-align: center;
+      padding: 2.5rem 1rem 2rem;
+    }
+
+    .page-title-band h1 {
+      font-family: 'Archivo Black', sans-serif;
+      font-size: 2.2rem;
+      letter-spacing: 0.01em;
+      line-height: 1.1;
+    }
+
+    .page-title-band p {
+      font-size: 0.9rem;
+      color: #9F936B;
+      margin-top: 0.4rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      font-family: 'PT Serif', serif;
+    }
+
+    /* ---- Month nav ---- */
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1.25rem;
+      padding: 1.5rem 1.5rem 0.75rem;
+    }
+
+    .nav button {
+      background: #fff;
+      border: 1.5px solid #d1cdc4;
+      color: #333;
+      border-radius: 4px;
+      width: 2.2rem;
+      height: 2.2rem;
+      font-size: 1.1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+      font-family: inherit;
+    }
+
+    .nav button:hover {
+      border-color: #3B4A50;
+      color: #3B4A50;
+      background: #f5f4f0;
+    }
+
+    .nav h2 {
+      font-family: 'Archivo Black', sans-serif;
+      font-size: 1.25rem;
+      min-width: 210px;
+      text-align: center;
+      color: #000;
+      letter-spacing: 0.01em;
+    }
+
+    /* ---- Legend ---- */
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem 1.25rem;
+      padding: 0.25rem 1.5rem 1.25rem;
+      justify-content: center;
+      border-bottom: 1px solid #f0ede6;
+      margin-bottom: 1rem;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-size: 0.72rem;
+      color: #555;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      font-family: 'PT Serif', serif;
+    }
+
+    .legend-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 2px;
+    }
+
+    /* ---- Calendar grid ---- */
+    .calendar-grid {
+      padding: 0 1.25rem 3rem;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    .day-headers {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 3px;
+      margin-bottom: 3px;
+    }
+
+    .day-header {
+      text-align: center;
+      font-family: 'PT Serif', serif;
+      font-size: 0.68rem;
+      font-weight: 400;
+      color: #999;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 0.4rem 0;
+    }
+
+    .month-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 3px;
+    }
+
+    .day-cell {
+      background: #faf9f6;
+      border-radius: 4px;
+      min-height: 88px;
+      padding: 0.45rem 0.4rem;
+      border: 1px solid #ece9e1;
+      transition: border-color 0.1s;
+    }
+
+    .day-cell.other-month {
+      background: #f9f8f5;
+      opacity: 0.4;
+    }
+
+    .day-cell.today {
+      border-color: #4D3033;
+      border-width: 2px;
+      background: #fff;
+    }
+
+    .day-number {
+      font-family: 'PT Serif', serif;
+      font-size: 0.75rem;
+      color: #888;
+      margin-bottom: 4px;
+      line-height: 1;
+    }
+
+    .day-cell.today .day-number {
+      background: #4D3033;
+      color: #fff;
+      width: 1.5rem;
+      height: 1.5rem;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+    }
+
+    /* ---- Event chips ---- */
+    .event-chip {
+      font-family: 'PT Serif', serif;
+      font-size: 0.62rem;
+      padding: 2px 5px;
+      border-radius: 2px;
+      margin-bottom: 2px;
+      cursor: pointer;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-weight: 400;
+      transition: opacity 0.15s;
+      display: block;
+      letter-spacing: 0.01em;
+    }
+
+    .event-chip:hover { opacity: 0.75; }
+    .event-chip.multi-start { border-radius: 2px 0 0 2px; }
+    .event-chip.multi-mid   { border-radius: 0; }
+    .event-chip.multi-end   { border-radius: 0 2px 2px 0; }
+
+    /* Type colors - Valor palette */
+    .type-regular   { background: #dce8ed; color: #2a4048; }
+    .type-outing    { background: #e8e2d5; color: #5a4a2a; }
+    .type-special   { background: #e8dde0; color: #5a2d33; }
+    .type-camp      { background: #4D3033; color: #fff; }
+    .type-gospel    { background: #9F936B; color: #fff; }
+    .type-cancelled { background: #ece9e1; color: #999; }
+
+    /* Legend dots */
+    .dot-regular   { background: #3B4A50; }
+    .dot-outing    { background: #9F936B; }
+    .dot-special   { background: #4D3033; }
+    .dot-camp      { background: #4D3033; }
+    .dot-gospel    { background: #9F936B; }
+    .dot-cancelled { background: #ccc; }
+
+    /* ---- Modal ---- */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .modal-backdrop.open { display: flex; }
+
+    .modal {
+      background: #fff;
+      border-radius: 6px;
+      padding: 1.75rem;
+      max-width: 430px;
+      width: 100%;
+      position: relative;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: none;
+      border: none;
+      font-size: 1.3rem;
+      cursor: pointer;
+      color: #aaa;
+      line-height: 1;
+      transition: color 0.15s;
+    }
+    .modal-close:hover { color: #000; }
+
+    .modal-type-badge {
+      display: inline-block;
+      font-family: 'PT Serif', serif;
+      font-size: 0.68rem;
+      font-weight: 400;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 3px 10px;
+      border-radius: 2px;
+      margin-bottom: 0.75rem;
+    }
+
+    .modal h3 {
+      font-family: 'Archivo Black', sans-serif;
+      font-size: 1.35rem;
+      margin-bottom: 0.2rem;
+      line-height: 1.2;
+      color: #000;
+      letter-spacing: 0.01em;
+    }
+
+    .modal-date {
+      font-family: 'PT Serif', serif;
+      font-size: 0.82rem;
+      color: #9F936B;
+      margin-bottom: 1rem;
+      letter-spacing: 0.02em;
+    }
+
+    .modal-detail {
+      display: flex;
+      gap: 0.6rem;
+      margin-bottom: 0.45rem;
+      align-items: flex-start;
+      font-size: 0.88rem;
+      font-family: 'PT Serif', serif;
+    }
+
+    .modal-detail-label {
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #9F936B;
+      font-weight: 400;
+      flex-shrink: 0;
+      min-width: 52px;
+      padding-top: 2px;
+    }
+
+    .modal-description {
+      margin-top: 0.85rem;
+      padding-top: 0.85rem;
+      border-top: 1px solid #ece9e1;
+      font-family: 'PT Serif', serif;
+      font-size: 0.88rem;
+      color: #333;
+      line-height: 1.6;
+    }
+
+    .modal-notes {
+      margin-top: 0.5rem;
+      font-family: 'PT Serif', serif;
+      font-size: 0.78rem;
+      color: #9F936B;
+      font-style: italic;
+    }
+
+    .modal-rsvp-btn {
+      display: none;
+      margin-top: 1.25rem;
+      width: 100%;
+      padding: 0.7rem 1rem;
+      background: #3B4A50;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-family: 'Archivo Black', sans-serif;
+      font-size: 0.85rem;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .modal-rsvp-btn:hover { background: #2d3a3f; }
+    .modal-rsvp-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+    .modal-rsvp-btn.visible { display: block; }
+
+    /* RSVP modal */
+    .rsvp-modal {
+      max-width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 1.75rem;
+    }
+
+    .rsvp-header { margin-bottom: 1rem; }
+
+    .rsvp-intro {
+      font-family: 'PT Serif', serif;
+      font-size: 0.85rem;
+      color: #666;
+      margin-bottom: 1.1rem;
+      line-height: 1.6;
+    }
+
+    .rsvp-section-label {
+      font-family: 'PT Serif', serif;
+      font-size: 0.68rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #9F936B;
+      margin: 1rem 0 0.5rem;
+    }
+
+    .rsvp-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.65rem;
+    }
+
+    .rsvp-field { margin-bottom: 0.65rem; }
+    .rsvp-field--sm { max-width: 120px; }
+
+    .rsvp-field label {
+      display: block;
+      font-family: 'PT Serif', serif;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #666;
+      margin-bottom: 0.35rem;
+    }
+
+    .rsvp-field input {
+      width: 100%;
+      padding: 0.55rem 0.75rem;
+      border: 1.5px solid #d1cdc4;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      font-family: 'PT Serif', serif;
+      outline: none;
+      transition: border-color 0.15s;
+      background: #fff;
+    }
+    .rsvp-field input:focus { border-color: #3B4A50; }
+
+    .rsvp-error {
+      font-size: 0.8rem;
+      color: #c0392b;
+      margin: 0.4rem 0;
+      min-height: 1.1rem;
+      font-family: 'PT Serif', serif;
+    }
+
+    .rsvp-submit-btn {
+      width: 100%;
+      margin-top: 0.5rem;
+      padding: 0.7rem 1rem;
+      background: #3B4A50;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-family: 'Archivo Black', sans-serif;
+      font-size: 0.85rem;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .rsvp-submit-btn:hover { background: #2d3a3f; }
+    .rsvp-submit-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    .rsvp-pay-section { margin-top: 1.1rem; }
+
+    .rsvp-pay-divider {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-family: 'PT Serif', serif;
+      font-size: 0.68rem;
+      color: #bbb;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 0.75rem;
+    }
+    .rsvp-pay-divider::before,
+    .rsvp-pay-divider::after { content: ''; flex: 1; height: 1px; background: #ece9e1; }
+
+    .rsvp-pay-note {
+      font-family: 'PT Serif', serif;
+      font-size: 0.78rem;
+      color: #9F936B;
+      text-align: center;
+      margin-top: 0.5rem;
+    }
+
+    .rsvp-success { text-align: center; padding: 0.5rem 0; }
+
+    .rsvp-success-icon {
+      width: 48px;
+      height: 48px;
+      background: #3B4A50;
+      color: #fff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin: 0 auto 1rem;
+    }
+
+    .rsvp-success h3 {
+      font-family: 'Archivo Black', sans-serif;
+      margin-bottom: 0.5rem;
+    }
+    .rsvp-success p { font-family: 'PT Serif', serif; font-size: 0.88rem; color: #666; }
+
+    .modal-pay-btn {
+      display: none;
+      margin-top: 1.1rem;
+      width: 100%;
+      padding: 0.7rem 1rem;
+      background: #3B4A50;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-family: 'Archivo Black', sans-serif;
+      font-size: 0.85rem;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+      transition: background 0.15s;
+    }
+    .modal-pay-btn:hover { background: #2d3a3f; }
+    .modal-pay-btn.visible { display: block; }
+
+    .modal-ics-btn {
+      margin-top: 0.6rem;
+      width: 100%;
+      padding: 0.6rem 1rem;
+      background: #fff;
+      border: 1.5px solid #d1cdc4;
+      border-radius: 4px;
+      font-family: 'PT Serif', serif;
+      font-size: 0.82rem;
+      color: #333;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .modal-ics-btn:hover { border-color: #3B4A50; color: #3B4A50; }
+
+    .event-chip.past-chip { opacity: 0.4; }
+
+    .modal-flyer {
+      width: 100%;
+      max-height: 200px;
+      object-fit: cover;
+      border-radius: 4px;
+      margin-bottom: 1rem;
+      display: block;
+    }
+
+    .modal-share-btn {
+      margin-top: 0.5rem;
+      width: 100%;
+      padding: 0.55rem 1rem;
+      background: transparent;
+      border: 1.5px solid #ece9e1;
+      border-radius: 4px;
+      font-family: 'PT Serif', serif;
+      font-size: 0.78rem;
+      color: #aaa;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .modal-share-btn:hover { border-color: #9F936B; color: #9F936B; }
+
+    .mobile-footer { display: none; }
+
+    @media (max-width: 640px) {
+      header { padding: 0 1rem; }
+      .header-links .header-link:not(.admin-link) { display: none; }
+      .page-title-band h1 { font-size: 1.6rem; }
+      .day-cell { min-height: 60px; padding: 0.3rem; }
+      .day-header { font-size: 0.58rem; }
+      .event-chip { font-size: 0.55rem; }
+      .nav h2 { font-size: 1rem; min-width: 170px; }
+
+      .mobile-footer {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 1.5rem 1rem;
+        border-top: 1px solid #ece9e1;
+        background: #faf9f6;
+      }
+
+      .footer-link {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-family: 'PT Serif', serif;
+        font-size: 0.85rem;
+        color: #333;
+        text-decoration: none;
+        transition: color 0.15s;
+      }
+      .footer-link:hover { color: #000; }
+      .footer-link svg { width: 16px; height: 16px; fill: currentColor; flex-shrink: 0; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <a href="/" class="header-logo">
+    <img src="/valor-mark.png" alt="Valor" style="width:40px;height:40px;object-fit:contain;">
+    <div>
+      <div class="header-logo-text">Valor Youth</div>
+      <span class="header-logo-sub">Events Calendar</span>
+    </div>
+  </a>
+  <div class="header-links">
+    <a href="mailto:youth@valor.church" class="header-link">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"/></svg>
+      youth@valor.church
+    </a>
+    <a href="https://instagram.com/_valoryouth" target="_blank" rel="noopener" class="header-link">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 1.366.062 2.633.334 3.608 1.308.975.975 1.246 2.242 1.308 3.608.058 1.266.07 1.646.07 4.85s-.012 3.584-.07 4.85c-.062 1.366-.334 2.633-1.308 3.608-.975.975-2.242 1.246-3.608 1.308-1.266.058-1.646.07-4.85.07s-3.584-.012-4.85-.07c-1.366-.062-2.633-.334-3.608-1.308-.975-.975-1.246-2.242-1.308-3.608C2.175 15.584 2.163 15.204 2.163 12s.012-3.584.07-4.85c.062-1.366.334-2.633 1.308-3.608.975-.975 2.242-1.246 3.608-1.308 1.266-.058 1.646-.07 4.85-.07zm0-2.163c-3.259 0-3.667.014-4.947.072-1.613.074-3.067.418-4.205 1.557C1.709 2.768 1.365 4.222 1.291 5.835 1.233 7.115 1.219 7.523 1.219 12c0 4.477.014 4.885.072 6.165.074 1.613.418 3.067 1.557 4.205 1.138 1.139 2.592 1.483 4.205 1.557C8.333 23.986 8.741 24 12 24s3.667-.014 4.947-.072c1.613-.074 3.067-.418 4.205-1.557 1.139-1.138 1.483-2.592 1.557-4.205.058-1.28.072-1.688.072-6.165 0-4.477-.014-4.885-.072-6.165-.074-1.613-.418-3.067-1.557-4.205C19.014.49 17.56.146 15.947.072 14.667.014 14.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zm0 10.162a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+      @_valoryouth
+    </a>
+    <a href="/admin.html" class="admin-link">Staff Login</a>
+  </div>
+</header>
+
+<div class="page-title-band">
+  <h1>Youth Events</h1>
+  <p>Valor Church &mdash; Arvada, CO</p>
+</div>
+
+<div class="nav">
+  <button id="prevBtn" title="Previous month">&#8249;</button>
+  <h2 id="monthLabel"></h2>
+  <button id="nextBtn" title="Next month">&#8250;</button>
+</div>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot dot-regular"></div> Regular Youth</div>
+  <div class="legend-item"><div class="legend-dot dot-outing"></div> Outing</div>
+  <div class="legend-item"><div class="legend-dot dot-special"></div> Special Event</div>
+  <div class="legend-item"><div class="legend-dot dot-camp"></div> Camp</div>
+  <div class="legend-item"><div class="legend-dot dot-gospel"></div> Gospel Night</div>
+  <div class="legend-item"><div class="legend-dot dot-cancelled"></div> No Youth</div>
+</div>
+
+<div class="calendar-grid">
+  <div class="day-headers">
+    <div class="day-header">Sun</div>
+    <div class="day-header">Mon</div>
+    <div class="day-header">Tue</div>
+    <div class="day-header">Wed</div>
+    <div class="day-header">Thu</div>
+    <div class="day-header">Fri</div>
+    <div class="day-header">Sat</div>
+  </div>
+  <div class="month-grid" id="monthGrid"></div>
+</div>
+
+<div class="modal-backdrop" id="modalBackdrop">
+  <div class="modal" id="modal">
+    <button class="modal-close" id="modalClose">&times;</button>
+    <img id="modalFlyer" class="modal-flyer" src="" alt="" style="display:none;">
+    <div class="modal-type-badge" id="modalBadge"></div>
+    <h3 id="modalTitle"></h3>
+    <div class="modal-date" id="modalDate"></div>
+    <div id="modalDetails"></div>
+    <div class="modal-description" id="modalDesc"></div>
+    <div class="modal-notes" id="modalNotes"></div>
+    <button class="modal-rsvp-btn" id="modalRsvpBtn">RSVP &amp; Register</button>
+    <button class="modal-ics-btn" id="modalIcsBtn">Add to Calendar</button>
+    <button class="modal-share-btn" id="modalShareBtn">Copy Event Link</button>
+  </div>
+</div>
+
+<!-- RSVP Modal -->
+<div class="modal-backdrop" id="rsvpBackdrop">
+  <div class="modal rsvp-modal" id="rsvpModal">
+    <button class="modal-close" id="rsvpClose">&times;</button>
+    <div class="rsvp-header">
+      <div class="modal-type-badge" id="rsvpBadge"></div>
+      <h3 id="rsvpEventTitle"></h3>
+      <div class="modal-date" id="rsvpEventDate"></div>
+    </div>
+
+    <div id="rsvpForm">
+      <p class="rsvp-intro">Fill out the form below to save your spot. You'll receive a confirmation email with payment details.</p>
+
+      <div class="rsvp-section-label">Student Info</div>
+      <div class="rsvp-row">
+        <div class="rsvp-field">
+          <label for="rStudentName">Student Name</label>
+          <input type="text" id="rStudentName" placeholder="First &amp; Last name">
+        </div>
+        <div class="rsvp-field rsvp-field--sm">
+          <label for="rStudentAge">Age</label>
+          <input type="number" id="rStudentAge" placeholder="e.g. 14" min="8" max="25">
+        </div>
+      </div>
+
+      <div class="rsvp-section-label">Parent / Guardian Info</div>
+      <div class="rsvp-field">
+        <label for="rParentName">Parent Name</label>
+        <input type="text" id="rParentName" placeholder="First &amp; Last name">
+      </div>
+      <div class="rsvp-row">
+        <div class="rsvp-field">
+          <label for="rPhone">Phone Number</label>
+          <input type="tel" id="rPhone" placeholder="(555) 000-0000">
+        </div>
+        <div class="rsvp-field">
+          <label for="rEmail">Email Address</label>
+          <input type="email" id="rEmail" placeholder="you@example.com">
+        </div>
+      </div>
+
+      <div class="rsvp-error" id="rsvpError"></div>
+
+      <button class="rsvp-submit-btn" id="rsvpSubmit">Submit RSVP</button>
+
+      <div class="rsvp-pay-section" id="rsvpPaySection">
+        <div class="rsvp-pay-divider"><span>then complete payment</span></div>
+        <a class="modal-pay-btn visible" id="rsvpPayLink"
+           href="https://valor.churchcenter.com/giving/to/tlc-youth?_gl=1%2A13jam3e%2A_ga%2AOTY1NjUxMzgxLjE3NzkxMjY2MzM.%2A_ga_CSE1VTY9C9%2AczE3NzkxNDAyMzckbzIkZzEkdDE3NzkxNDAyNDIkajU1JGwwJGgw"
+           target="_blank" rel="noopener">Pay Now via Church Center</a>
+        <p class="rsvp-pay-note" id="rsvpCostNote"></p>
+      </div>
+    </div>
+
+    <div class="rsvp-success" id="rsvpSuccess" style="display:none;">
+      <div class="rsvp-success-icon">&#10003;</div>
+      <h3>You're registered!</h3>
+      <p>A confirmation email has been sent to <strong id="rsvpSuccessEmail"></strong>.</p>
+      <div class="rsvp-pay-section" id="rsvpSuccessPaySection">
+        <div class="rsvp-pay-divider"><span>complete your payment</span></div>
+        <a class="modal-pay-btn visible"
+           href="https://valor.churchcenter.com/giving/to/tlc-youth?_gl=1%2A13jam3e%2A_ga%2AOTY1NjUxMzgxLjE3NzkxMjY2MzM.%2A_ga_CSE1VTY9C9%2AczE3NzkxNDAyMzckbzIkZzEkdDE3NzkxNDAyNDIkajU1JGwwJGgw"
+           target="_blank" rel="noopener">Pay Now via Church Center</a>
+      </div>
+      <button class="modal-ics-btn" id="rsvpSuccessIcs" style="margin-top:0.6rem;">Add to Calendar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const TYPE_LABELS = {
+    regular:   'Regular Youth',
+    outing:    'Outing',
+    special:   'Special Event',
+    camp:      'Camp',
+    gospel:    'Gospel Night',
+    cancelled: 'No Youth'
+  };
+
+  let events = [];
+  let currentYear, currentMonth;
+
+  const today = new Date();
+  currentYear = today.getFullYear();
+  currentMonth = today.getMonth();
+
+  async function loadEvents() {
+    const res = await fetch('/api/events');
+    events = await res.json();
+    renderCalendar();
+
+    const params = new URLSearchParams(location.search);
+    const eventId = params.get('event');
+    if (eventId) {
+      const evt = events.find(e => e.id === eventId);
+      if (evt) {
+        const [yr, mo] = evt.date.split('-');
+        currentYear  = parseInt(yr);
+        currentMonth = parseInt(mo) - 1;
+        renderCalendar();
+        showModal(evt);
+      }
+    }
+  }
+
+  function renderCalendar() {
+    const label = document.getElementById('monthLabel');
+    const grid = document.getElementById('monthGrid');
+
+    const monthNames = ['January','February','March','April','May','June',
+                        'July','August','September','October','November','December'];
+    label.textContent = `${monthNames[currentMonth]} ${currentYear}`;
+
+    const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+    const daysInPrev = new Date(currentYear, currentMonth, 0).getDate();
+    const totalCells = Math.ceil((firstDay + daysInMonth) / 7) * 7;
+
+    grid.innerHTML = '';
+
+    for (let i = 0; i < totalCells; i++) {
+      const cell = document.createElement('div');
+      cell.className = 'day-cell';
+
+      let dayNum, year, month, isOtherMonth = false;
+
+      if (i < firstDay) {
+        dayNum = daysInPrev - firstDay + i + 1;
+        month = currentMonth === 0 ? 11 : currentMonth - 1;
+        year = currentMonth === 0 ? currentYear - 1 : currentYear;
+        isOtherMonth = true;
+      } else if (i >= firstDay + daysInMonth) {
+        dayNum = i - firstDay - daysInMonth + 1;
+        month = currentMonth === 11 ? 0 : currentMonth + 1;
+        year = currentMonth === 11 ? currentYear + 1 : currentYear;
+        isOtherMonth = true;
+      } else {
+        dayNum = i - firstDay + 1;
+        month = currentMonth;
+        year = currentYear;
+      }
+
+      if (isOtherMonth) cell.classList.add('other-month');
+
+      const cellDate = new Date(year, month, dayNum);
+      const isToday = cellDate.toDateString() === today.toDateString();
+      if (isToday) cell.classList.add('today');
+
+      const numEl = document.createElement('div');
+      numEl.className = 'day-number';
+      numEl.textContent = dayNum;
+      cell.appendChild(numEl);
+
+      const dateStr = `${year}-${String(month + 1).padStart(2,'0')}-${String(dayNum).padStart(2,'0')}`;
+      const dayEvents = getEventsForDate(dateStr);
+
+      dayEvents.forEach(({ event, span }) => {
+        const chip = document.createElement('div');
+        const spanClass = span === 'single' ? '' : ` multi-${span}`;
+        chip.className = `event-chip type-${event.type}${spanClass}`;
+        chip.textContent = span === 'mid' ? ' ' : event.title;
+        chip.setAttribute('title', event.title);
+        chip.addEventListener('click', () => showModal(event));
+        cell.appendChild(chip);
+      });
+
+      grid.appendChild(cell);
+    }
+  }
+
+  function getEventsForDate(dateStr) {
+    return events
+      .filter(e => {
+        if (e.endDate) {
+          return dateStr >= e.date && dateStr <= e.endDate;
+        }
+        return e.date === dateStr;
+      })
+      .map(e => ({
+        event: e,
+        span: !e.endDate ? 'single'
+          : (dateStr === e.date ? 'start'
+          : (dateStr === e.endDate ? 'end' : 'mid'))
+      }));
+  }
+
+  function formatDate(dateStr, endDateStr) {
+    const opts = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    const d = new Date(dateStr + 'T12:00:00');
+    if (endDateStr) {
+      const end = new Date(endDateStr + 'T12:00:00');
+      return `${d.toLocaleDateString('en-US', opts)} - ${end.toLocaleDateString('en-US', opts)}`;
+    }
+    return d.toLocaleDateString('en-US', opts);
+  }
+
+  function showModal(event) {
+    const badge = document.getElementById('modalBadge');
+    badge.textContent = TYPE_LABELS[event.type] || event.type;
+    badge.className = `modal-type-badge type-${event.type}`;
+
+    document.getElementById('modalTitle').textContent = event.title;
+    document.getElementById('modalDate').textContent = formatDate(event.date, event.endDate);
+
+    const details = document.getElementById('modalDetails');
+    details.innerHTML = '';
+
+    if (event.time) {
+      details.innerHTML += `<div class="modal-detail"><span class="modal-detail-label">Time</span><span>${event.time}</span></div>`;
+    }
+    if (event.location) {
+      details.innerHTML += `<div class="modal-detail"><span class="modal-detail-label">Where</span><span>${event.location}</span></div>`;
+    }
+    if (event.cost) {
+      details.innerHTML += `<div class="modal-detail"><span class="modal-detail-label">Cost</span><span>${event.cost}</span></div>`;
+    }
+
+    const desc = document.getElementById('modalDesc');
+    desc.textContent = event.description || '';
+    desc.style.display = event.description ? '' : 'none';
+
+    const notes = document.getElementById('modalNotes');
+    notes.textContent = event.notes ? `Note: ${event.notes}` : '';
+    notes.style.display = event.notes ? '' : 'none';
+
+    const flyer = document.getElementById('modalFlyer');
+    if (event.imageUrl) {
+      flyer.src = event.imageUrl;
+      flyer.style.display = 'block';
+    } else {
+      flyer.style.display = 'none';
+    }
+
+    const showRsvp = event.rsvpEnabled !== undefined
+      ? event.rsvpEnabled
+      : (['outing', 'special', 'camp'].includes(event.type) || !!event.cost);
+    const rsvpBtn = document.getElementById('modalRsvpBtn');
+    rsvpBtn.classList.toggle('visible', showRsvp);
+    rsvpBtn.disabled = false;
+    rsvpBtn.textContent = 'RSVP & Register';
+    rsvpBtn.onclick = () => openRsvp(event);
+
+    if (showRsvp && event.rsvpCapacity) {
+      fetch(`/api/events/${event.id}/spots`)
+        .then(r => r.json())
+        .then(spots => {
+          if (spots.full) {
+            rsvpBtn.textContent = 'Event Full';
+            rsvpBtn.disabled = true;
+          } else {
+            rsvpBtn.textContent = `RSVP & Register (${spots.available} spot${spots.available !== 1 ? 's' : ''} left)`;
+          }
+        })
+        .catch(() => {});
+    }
+
+    document.getElementById('modalIcsBtn').onclick = () => downloadICS(event);
+    document.getElementById('modalShareBtn').onclick = () => {
+      const url = `${location.origin}/?event=${event.id}`;
+      navigator.clipboard.writeText(url).then(() => {
+        const btn = document.getElementById('modalShareBtn');
+        btn.textContent = 'Link copied!';
+        setTimeout(() => { btn.textContent = 'Copy Event Link'; }, 2000);
+      });
+    };
+
+    history.replaceState(null, '', `?event=${event.id}`);
+    document.getElementById('modalBackdrop').classList.add('open');
+  }
+
+  let rsvpCurrentEvent = null;
+
+  function openRsvp(event) {
+    rsvpCurrentEvent = event;
+    document.getElementById('modalBackdrop').classList.remove('open');
+
+    document.getElementById('rsvpBadge').textContent = TYPE_LABELS[event.type] || event.type;
+    document.getElementById('rsvpBadge').className = `modal-type-badge type-${event.type}`;
+    document.getElementById('rsvpEventTitle').textContent = event.title;
+    document.getElementById('rsvpEventDate').textContent = formatDate(event.date, event.endDate);
+
+    const showPayment = event.requirePayment !== undefined ? event.requirePayment : !!event.cost;
+    const paySection = document.getElementById('rsvpPaySection');
+    paySection.style.display = showPayment ? '' : 'none';
+
+    const costNote = document.getElementById('rsvpCostNote');
+    costNote.textContent = showPayment && event.cost ? `Cost: ${event.cost}` : '';
+
+    document.getElementById('rsvpForm').style.display = '';
+    document.getElementById('rsvpSuccess').style.display = 'none';
+    document.getElementById('rsvpError').textContent = '';
+    document.getElementById('rsvpSubmit').disabled = false;
+    document.getElementById('rsvpSubmit').textContent = 'Submit RSVP';
+
+    ['rStudentName','rStudentAge','rParentName','rPhone','rEmail'].forEach(id => {
+      document.getElementById(id).value = '';
+    });
+
+    document.getElementById('rsvpBackdrop').classList.add('open');
+  }
+
+  document.getElementById('rsvpClose').addEventListener('click', () => {
+    document.getElementById('rsvpBackdrop').classList.remove('open');
+  });
+
+  document.getElementById('rsvpBackdrop').addEventListener('click', e => {
+    if (e.target === document.getElementById('rsvpBackdrop')) {
+      document.getElementById('rsvpBackdrop').classList.remove('open');
+    }
+  });
+
+  document.getElementById('rsvpSubmit').addEventListener('click', async () => {
+    const studentName = document.getElementById('rStudentName').value.trim();
+    const studentAge  = document.getElementById('rStudentAge').value.trim();
+    const parentName  = document.getElementById('rParentName').value.trim();
+    const phone       = document.getElementById('rPhone').value.trim();
+    const email       = document.getElementById('rEmail').value.trim();
+    const errorEl     = document.getElementById('rsvpError');
+
+    if (!studentName || !studentAge || !parentName || !phone || !email) {
+      errorEl.textContent = 'Please fill in all fields.';
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      errorEl.textContent = 'Please enter a valid email address.';
+      return;
+    }
+
+    errorEl.textContent = '';
+    const btn = document.getElementById('rsvpSubmit');
+    btn.disabled = true;
+    btn.textContent = 'Sending…';
+
+    try {
+      const res = await fetch('/api/rsvp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          eventId:     rsvpCurrentEvent.id,
+          studentName, studentAge, parentName, phone, email
+        })
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Something went wrong.');
+      }
+
+      document.getElementById('rsvpSuccessEmail').textContent = email;
+      const successPaySection = document.getElementById('rsvpSuccessPaySection');
+      const showSuccessPayment = rsvpCurrentEvent.requirePayment !== undefined
+        ? rsvpCurrentEvent.requirePayment : !!rsvpCurrentEvent.cost;
+      successPaySection.style.display = showSuccessPayment ? '' : 'none';
+      document.getElementById('rsvpSuccessIcs').onclick = () => downloadICS(rsvpCurrentEvent);
+
+      document.getElementById('rsvpForm').style.display = 'none';
+      document.getElementById('rsvpSuccess').style.display = '';
+    } catch (err) {
+      errorEl.textContent = err.message;
+      btn.disabled = false;
+      btn.textContent = 'Submit RSVP';
+    }
+  });
+
+  function toICSDate(dateStr) {
+    return dateStr.replace(/-/g, '');
+  }
+
+  function nextDay(dateStr) {
+    const d = new Date(dateStr + 'T12:00:00');
+    d.setDate(d.getDate() + 1);
+    return d.toISOString().slice(0, 10).replace(/-/g, '');
+  }
+
+  function escapeICS(str) {
+    return (str || '').replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\n/g, '\\n');
+  }
+
+  function downloadICS(event) {
+    const dtstart = toICSDate(event.date);
+    const dtend = nextDay(event.endDate || event.date);
+    const now = new Date().toISOString().replace(/[-:.]/g, '').slice(0, 15) + 'Z';
+
+    const descParts = [];
+    if (event.time)     descParts.push('Time: ' + event.time);
+    if (event.cost)     descParts.push('Cost: ' + event.cost);
+    if (event.description) descParts.push(event.description);
+    if (event.notes)    descParts.push('Note: ' + event.notes);
+
+    const lines = [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//Valor Youth//Events Calendar//EN',
+      'CALSCALE:GREGORIAN',
+      'METHOD:PUBLISH',
+      'BEGIN:VEVENT',
+      `UID:${event.id}@valoryouth`,
+      `DTSTAMP:${now}`,
+      `DTSTART;VALUE=DATE:${dtstart}`,
+      `DTEND;VALUE=DATE:${dtend}`,
+      `SUMMARY:${escapeICS(event.title)}`,
+      event.location ? `LOCATION:${escapeICS(event.location)}` : null,
+      descParts.length ? `DESCRIPTION:${escapeICS(descParts.join('\\n'))}` : null,
+      'END:VEVENT',
+      'END:VCALENDAR'
+    ].filter(Boolean).join('\r\n');
+
+    const blob = new Blob([lines], { type: 'text/calendar;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${event.title.replace(/[^a-z0-9]/gi, '_')}.ics`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function closeModal() {
+    document.getElementById('modalBackdrop').classList.remove('open');
+    history.replaceState(null, '', '/');
+  }
+
+  document.getElementById('modalClose').addEventListener('click', closeModal);
+
+  document.getElementById('modalBackdrop').addEventListener('click', e => {
+    if (e.target === document.getElementById('modalBackdrop')) closeModal();
+  });
+
+  document.getElementById('prevBtn').addEventListener('click', () => {
+    currentMonth--;
+    if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+    renderCalendar();
+  });
+
+  document.getElementById('nextBtn').addEventListener('click', () => {
+    currentMonth++;
+    if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+    renderCalendar();
+  });
+
+
+  loadEvents();
+</script>
+
+<footer class="mobile-footer">
+  <a href="mailto:youth@valor.church" class="footer-link">
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"/></svg>
+    youth@valor.church
+  </a>
+  <a href="https://instagram.com/_valoryouth" target="_blank" rel="noopener" class="footer-link">
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 1.366.062 2.633.334 3.608 1.308.975.975 1.246 2.242 1.308 3.608.058 1.266.07 1.646.07 4.85s-.012 3.584-.07 4.85c-.062 1.366-.334 2.633-1.308 3.608-.975.975-2.242 1.246-3.608 1.308-1.266.058-1.646.07-4.85.07s-3.584-.012-4.85-.07c-1.366-.062-2.633-.334-3.608-1.308-.975-.975-1.246-2.242-1.308-3.608C2.175 15.584 2.163 15.204 2.163 12s.012-3.584.07-4.85c.062-1.366.334-2.633 1.308-3.608.975-.975 2.242-1.246 3.608-1.308 1.266-.058 1.646-.07 4.85-.07zm0-2.163c-3.259 0-3.667.014-4.947.072-1.613.074-3.067.418-4.205 1.557C1.709 2.768 1.365 4.222 1.291 5.835 1.233 7.115 1.219 7.523 1.219 12c0 4.477.014 4.885.072 6.165.074 1.613.418 3.067 1.557 4.205 1.138 1.139 2.592 1.483 4.205 1.557C8.333 23.986 8.741 24 12 24s3.667-.014 4.947-.072c1.613-.074 3.067-.418 4.205-1.557 1.139-1.138 1.483-2.592 1.557-4.205.058-1.28.072-1.688.072-6.165 0-4.477-.014-4.885-.072-6.165-.074-1.613-.418-3.067-1.557-4.205C19.014.49 17.56.146 15.947.072 14.667.014 14.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zm0 10.162a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+    @_valoryouth
+  </a>
+</footer>
+</body>
+</html>
