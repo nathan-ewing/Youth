@@ -1350,6 +1350,7 @@
 
     const cards = rsvps.map(r => {
       const submitted = new Date(r.submittedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      const paid = !!r.paid;
       return `
         <div class="roster-card" id="card-${r.id}">
           <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:0.75rem;">
@@ -1362,10 +1363,16 @@
               </div>
               <div class="roster-card-date">Registered ${submitted}</div>
             </div>
-            <button onclick="deleteRsvp('${r.id}')"
-              style="flex-shrink:0;background:none;border:1.5px solid #e5e2dc;border-radius:4px;color:#aaa;cursor:pointer;font-size:0.7rem;font-family:'PT Serif',serif;padding:0.22rem 0.55rem;transition:all 0.15s;white-space:nowrap;"
-              onmouseover="this.style.borderColor='#b91c1c';this.style.color='#b91c1c';" onmouseout="this.style.borderColor='#e5e2dc';this.style.color='#aaa';"
-              title="Remove this RSVP">Remove</button>
+            <div style="display:flex;flex-direction:column;gap:0.4rem;align-items:flex-end;flex-shrink:0;">
+              <button onclick="togglePaid('${r.id}', ${paid})"
+                id="paid-btn-${r.id}"
+                style="background:${paid ? '#d1fae5' : 'none'};border:1.5px solid ${paid ? '#6ee7b7' : '#e5e2dc'};border-radius:4px;color:${paid ? '#065f46' : '#aaa'};cursor:pointer;font-size:0.7rem;font-family:'PT Serif',serif;padding:0.22rem 0.55rem;transition:all 0.15s;white-space:nowrap;"
+                title="Toggle payment status">${paid ? '✓ Paid' : 'Unpaid'}</button>
+              <button onclick="deleteRsvp('${r.id}')"
+                style="background:none;border:1.5px solid #e5e2dc;border-radius:4px;color:#aaa;cursor:pointer;font-size:0.7rem;font-family:'PT Serif',serif;padding:0.22rem 0.55rem;transition:all 0.15s;white-space:nowrap;"
+                onmouseover="this.style.borderColor='#b91c1c';this.style.color='#b91c1c';" onmouseout="this.style.borderColor='#e5e2dc';this.style.color='#aaa';"
+                title="Remove this RSVP">Remove</button>
+            </div>
           </div>
         </div>
       `;
@@ -1378,6 +1385,22 @@
       </div>
       ${cards}
     `;
+  }
+
+  async function togglePaid(rsvpId, currentlyPaid) {
+    try {
+      const res = await fetch(`/api/rsvps/${rsvpId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
+        body: JSON.stringify({ paid: !currentlyPaid })
+      });
+      if (!res.ok) throw new Error();
+      const updated = await res.json();
+      const idx = rosterCurrentRsvps.findIndex(r => r.id === rsvpId);
+      if (idx !== -1) rosterCurrentRsvps[idx] = updated;
+      renderRoster();
+      showToast(updated.paid ? 'Marked as paid.' : 'Marked as unpaid.');
+    } catch { showToast('Could not update payment status.'); }
   }
 
   async function deleteRsvp(rsvpId) {
@@ -1409,6 +1432,7 @@
         <td>${r.phone}</td>
         <td>${r.email}</td>
         <td>${new Date(r.submittedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</td>
+        <td style="color:${r.paid ? '#065f46' : '#aaa'};">${r.paid ? '✓ Paid' : 'Unpaid'}</td>
       </tr>`).join('');
 
     const win = window.open('', '_blank');
@@ -1433,7 +1457,7 @@
   <h1>${event.title}</h1>
   <div class="meta">${event.date}${event.endDate ? ' – ' + event.endDate : ''}${event.time ? ' &middot; ' + event.time : ''} &middot; ${rsvps.length} registration${rsvps.length !== 1 ? 's' : ''}${event.rsvpCapacity ? ' of ' + event.rsvpCapacity : ''}</div>
   <table>
-    <thead><tr><th>#</th><th>Student</th><th>Age</th><th>Parent</th><th>Phone</th><th>Email</th><th>Registered</th></tr></thead>
+    <thead><tr><th>#</th><th>Student</th><th>Age</th><th>Parent</th><th>Phone</th><th>Email</th><th>Registered</th><th>Paid</th></tr></thead>
     <tbody>${rows}</tbody>
   </table>
   <div class="footer">Printed ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} &middot; Valor Youth</div>

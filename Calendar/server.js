@@ -176,6 +176,16 @@ app.post('/api/rsvp', async (req, res) => {
   }
 });
 
+// Admin: update a single RSVP (e.g. mark paid)
+app.patch('/api/rsvps/:id', requireAuth, (req, res) => {
+  const rsvps = readRsvps();
+  const idx = rsvps.findIndex(r => r.id === req.params.id);
+  if (idx === -1) return res.status(404).json({ error: 'Not found' });
+  rsvps[idx] = { ...rsvps[idx], ...req.body };
+  writeRsvps(rsvps);
+  res.json(rsvps[idx]);
+});
+
 // Admin: delete a single RSVP
 app.delete('/api/rsvps/:id', requireAuth, (req, res) => {
   const rsvps = readRsvps();
