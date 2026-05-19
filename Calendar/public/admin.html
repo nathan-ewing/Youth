@@ -1067,7 +1067,7 @@
       row.addEventListener('click', () => openDrawer(event.id));
 
       if (showRsvpBadge) {
-        row.querySelector('.rsvp-badge').addEventListener('click', e => { e.stopPropagation(); openRoster(event); });
+        row.querySelector('.rsvp-badge').addEventListener('click', e => { e.stopPropagation(); downloadEventCSV(event); });
       }
 
       el.appendChild(row);
@@ -1363,9 +1363,9 @@
               <div class="roster-card-date">Registered ${submitted}</div>
             </div>
             <button onclick="deleteRsvp('${r.id}')"
-              style="background:none;border:1.5px solid #e5e2dc;border-radius:4px;color:#aaa;cursor:pointer;font-size:0.7rem;font-family:'PT Serif',serif;padding:0.2rem 0.5rem;flex-shrink:0;transition:all 0.15s;letter-spacing:0.03em;"
-              onmouseover="this.style.borderColor='#b91c1c';this.style.color='#b91c1c'" onmouseout="this.style.borderColor='#e5e2dc';this.style.color='#aaa'"
-              title="Remove this RSVP">Remove</button>
+              style="background:none;border:none;color:#ccc;cursor:pointer;font-size:1.1rem;padding:0;flex-shrink:0;transition:color 0.15s;"
+              onmouseover="this.style.color='#b91c1c'" onmouseout="this.style.color='#ccc'"
+              title="Remove RSVP">&times;</button>
           </div>
         </div>
       `;
@@ -1374,7 +1374,7 @@
     document.getElementById('rosterBody').innerHTML = `
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;gap:0.5rem;flex-wrap:wrap;">
         <p class="roster-count" style="margin:0;">${rsvps.length}${spotsText} registration${rsvps.length !== 1 ? 's' : ''}</p>
-        <button class="btn btn-ghost btn-sm" onclick="downloadCSV()">&#8681; Download CSV</button>
+        <button class="btn btn-ghost btn-sm" onclick="downloadCSV()">&#8681; CSV</button>
       </div>
       ${cards}
     `;
