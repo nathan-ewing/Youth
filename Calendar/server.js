@@ -246,4 +246,7 @@ app.post('/api/auth', (req, res) => {
   }
 });
 
-app.listen(PORT, () => console.log(`Valor Youth Calendar running on port ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`Valor Youth Calendar running on port ${PORT}`);
+  console.log(`Email sender: ${process.env.EMAIL_USER || '(not set)'}`);
+});
