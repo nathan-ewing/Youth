@@ -1,0 +1,8 @@
+modules = ["nodejs-20"]
+
+[[ports]]
+localPort = 3000
+externalPort = 80
+
+[deployment]
+run = ["sh", "-c", "cd Calendar && npm install && node server.js"]
