@@ -83,10 +83,14 @@ app.post('/api/rsvp', async (req, res) => {
 
   const existingRsvps = readRsvps();
 
-  // Prevent duplicate RSVP from same email for same event
-  const duplicate = existingRsvps.find(r => r.eventId === eventId && r.email.toLowerCase() === email.toLowerCase());
+  // Prevent duplicate RSVP for the same student (email + name) for the same event
+  const duplicate = existingRsvps.find(r =>
+    r.eventId === eventId &&
+    r.email.toLowerCase() === email.toLowerCase() &&
+    r.studentName.toLowerCase() === studentName.toLowerCase()
+  );
   if (duplicate) {
-    return res.status(400).json({ error: 'This email is already registered for this event.' });
+    return res.status(400).json({ error: 'This student is already registered for this event.' });
   }
 
   if (event.rsvpCapacity) {
