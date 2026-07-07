@@ -29,13 +29,17 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 async function readEvents() {
-  return (await db.get('events')) || [];
+  let data = await db.get('events');
+  if (typeof data === 'string') { try { data = JSON.parse(data); } catch { data = null; } }
+  return Array.isArray(data) ? data : [];
 }
 async function writeEvents(events) {
   await db.set('events', events);
 }
 async function readRsvps() {
-  return (await db.get('rsvps')) || [];
+  let data = await db.get('rsvps');
+  if (typeof data === 'string') { try { data = JSON.parse(data); } catch { data = null; } }
+  return Array.isArray(data) ? data : [];
 }
 async function writeRsvps(rsvps) {
   await db.set('rsvps', rsvps);
