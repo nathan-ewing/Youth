@@ -259,7 +259,7 @@ app.post('/api/auth', (req, res) => {
 });
 
 // Public: parent self-cancellation via link in confirmation email
-app.get('/cancel/:rsvpId', (req, res) => {
+app.get('/cancel/:rsvpId', async (req, res) => {
   const rsvps = readRsvps();
   const rsvp = rsvps.find(r => r.id === req.params.rsvpId);
 
