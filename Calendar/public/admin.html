@@ -1060,11 +1060,30 @@
         <div class="event-row-actions">
           ${showRsvpBadge ? `<button class="rsvp-badge${count === 0 ? ' no-rsvps' : ''}" data-id="${event.id}">&#128203; ${count} RSVP${count !== 1 ? 's' : ''}${spotsLabel}</button>` : ''}
           <button class="btn btn-ghost btn-sm edit-btn">Edit</button>
+          <button class="btn btn-sm delete-row-btn" title="Delete event" style="background:none;border:1.5px solid #e5e2dc;color:#ccc;width:28px;height:28px;padding:0;display:flex;align-items:center;justify-content:center;font-size:1rem;border-radius:var(--radius-sm);transition:all var(--t);">&#215;</button>
         </div>
       `;
 
       row.querySelector('.edit-btn').addEventListener('click', e => { e.stopPropagation(); openDrawer(event.id); });
       row.addEventListener('click', () => openDrawer(event.id));
+
+      row.querySelector('.delete-row-btn').addEventListener('click', async e => {
+        e.stopPropagation();
+        if (!confirm(`Delete "${event.title}"? This cannot be undone.`)) return;
+        try {
+          const res = await fetch(`/api/events/${event.id}`, { method: 'DELETE', headers: { 'x-admin-token': token } });
+          if (!res.ok) throw new Error();
+          showToast('Event deleted.');
+          loadAll();
+        } catch { showToast('Could not delete event.'); }
+      });
+
+      row.querySelector('.delete-row-btn').addEventListener('mouseover', function() {
+        this.style.borderColor = '#b91c1c'; this.style.color = '#b91c1c'; this.style.background = '#fff1f1';
+      });
+      row.querySelector('.delete-row-btn').addEventListener('mouseout', function() {
+        this.style.borderColor = '#e5e2dc'; this.style.color = '#ccc'; this.style.background = 'none';
+      });
 
       if (showRsvpBadge) {
         row.querySelector('.rsvp-badge').addEventListener('click', e => { e.stopPropagation(); openRoster(event); });
