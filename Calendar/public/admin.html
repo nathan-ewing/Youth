@@ -1362,6 +1362,7 @@
                 <a href="mailto:${r.email}">${r.email}</a>
               </div>
               <div class="roster-card-date">Registered ${submitted}</div>
+              ${r.notes ? `<div style="margin-top:4px;font-size:0.78rem;color:#b91c1c;font-family:'PT Serif',serif;">&#9888; ${r.notes}</div>` : ''}
             </div>
             <div style="display:flex;flex-direction:column;gap:0.4rem;align-items:flex-end;flex-shrink:0;">
               <button onclick="togglePaid('${r.id}', ${paid})"
@@ -1433,6 +1434,7 @@
         <td>${r.email}</td>
         <td>${new Date(r.submittedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</td>
         <td style="color:${r.paid ? '#065f46' : '#aaa'};">${r.paid ? '✓ Paid' : 'Unpaid'}</td>
+        <td style="color:${r.notes ? '#b91c1c' : '#aaa'};">${r.notes || '—'}</td>
       </tr>`).join('');
 
     const win = window.open('', '_blank');
@@ -1457,7 +1459,7 @@
   <h1>${event.title}</h1>
   <div class="meta">${event.date}${event.endDate ? ' – ' + event.endDate : ''}${event.time ? ' &middot; ' + event.time : ''} &middot; ${rsvps.length} registration${rsvps.length !== 1 ? 's' : ''}${event.rsvpCapacity ? ' of ' + event.rsvpCapacity : ''}</div>
   <table>
-    <thead><tr><th>#</th><th>Student</th><th>Age</th><th>Parent</th><th>Phone</th><th>Email</th><th>Registered</th><th>Paid</th></tr></thead>
+    <thead><tr><th>#</th><th>Student</th><th>Age</th><th>Parent</th><th>Phone</th><th>Email</th><th>Registered</th><th>Paid</th><th>Notes</th></tr></thead>
     <tbody>${rows}</tbody>
   </table>
   <div class="footer">Printed ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} &middot; Valor Youth</div>

@@ -78,7 +78,7 @@ app.get('/api/events/:id/spots', (req, res) => {
 
 // Public: RSVP to an event
 app.post('/api/rsvp', async (req, res) => {
-  const { eventId, studentName, studentAge, parentName, phone, email } = req.body;
+  const { eventId, studentName, studentAge, parentName, phone, email, notes } = req.body;
   if (!eventId || !studentName || !studentAge || !parentName || !phone || !email) {
     return res.status(400).json({ error: 'All fields are required.' });
   }
@@ -106,7 +106,7 @@ app.post('/api/rsvp', async (req, res) => {
     }
   }
 
-  const rsvp = { id: generateId(), eventId, studentName, studentAge, parentName, phone, email, submittedAt: new Date().toISOString() };
+  const rsvp = { id: generateId(), eventId, studentName, studentAge, parentName, phone, email, notes: notes || '', submittedAt: new Date().toISOString() };
   const rsvps = readRsvps();
   rsvps.push(rsvp);
   writeRsvps(rsvps);
@@ -138,6 +138,7 @@ app.post('/api/rsvp', async (req, res) => {
             <tr><td style="padding:6px 0;color:#555;">Parent Name</td><td style="padding:6px 0;font-weight:600;">${parentName}</td></tr>
             <tr><td style="padding:6px 0;color:#555;">Phone</td><td style="padding:6px 0;font-weight:600;">${phone}</td></tr>
             <tr><td style="padding:6px 0;color:#555;">Email</td><td style="padding:6px 0;font-weight:600;"><a href="mailto:${email}">${email}</a></td></tr>
+            ${notes ? `<tr><td colspan="2"><hr style="border:none;border-top:1px solid #e5e7eb;margin:12px 0;"></td></tr><tr><td style="padding:6px 0;color:#555;vertical-align:top;">Notes</td><td style="padding:6px 0;font-weight:600;color:#b91c1c;">${notes}</td></tr>` : ''}
           </table>
         </div>
       </div>`
@@ -281,6 +282,31 @@ app.get('/cancel/:rsvpId', (req, res) => {
 
   const eventName = event ? event.title : 'the event';
   res.send(page('Registration Cancelled', `<p><strong>${rsvp.studentName}</strong> has been removed from <strong>${eventName}</strong>.</p><p>Questions? Email <a href="mailto:youth@valor.church">youth@valor.church</a>.</p><p><a href="https://valoryouth.replit.app">Back to calendar</a></p>`));
+
+  try {
+    await createTransporter().sendMail({
+      from: `"Valor Youth" <${process.env.EMAIL_USER}>`,
+      to: 'youth@valor.church',
+      subject: `Cancellation: ${rsvp.studentName} — ${eventName}`,
+      html: `
+        <div style="font-family:sans-serif;max-width:480px;margin:0 auto;">
+          <div style="background:#000;padding:16px 20px;border-radius:8px 8px 0 0;">
+            <h2 style="color:#fff;margin:0;font-size:1.1rem;">RSVP Cancelled — Valor Youth</h2>
+          </div>
+          <div style="background:#f9f9f9;padding:20px;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 8px 8px;">
+            <p style="margin:0 0 12px;"><strong>${rsvp.parentName}</strong> cancelled the registration for <strong>${rsvp.studentName}</strong> from <strong>${eventName}</strong>${event ? ' on ' + event.date : ''}.</p>
+            <table style="width:100%;border-collapse:collapse;font-size:0.88rem;">
+              <tr><td style="padding:5px 0;color:#555;width:120px;">Student</td><td style="padding:5px 0;">${rsvp.studentName}, age ${rsvp.studentAge}</td></tr>
+              <tr><td style="padding:5px 0;color:#555;">Parent</td><td style="padding:5px 0;">${rsvp.parentName}</td></tr>
+              <tr><td style="padding:5px 0;color:#555;">Phone</td><td style="padding:5px 0;">${rsvp.phone}</td></tr>
+              <tr><td style="padding:5px 0;color:#555;">Email</td><td style="padding:5px 0;">${rsvp.email}</td></tr>
+            </table>
+          </div>
+        </div>`
+    });
+  } catch (err) {
+    console.error('Cancellation notification failed:', err.message);
+  }
 });
 
 app.listen(PORT, () => {
@@ -313,6 +339,7 @@ cron.schedule('0 12 * * *', async () => {
         <td style="padding:8px 10px;border-bottom:1px solid #e5e7eb;">${r.phone}</td>
         <td style="padding:8px 10px;border-bottom:1px solid #e5e7eb;">${r.email}</td>
         <td style="padding:8px 10px;border-bottom:1px solid #e5e7eb;color:${r.paid ? '#065f46' : '#9ca3af'};">${r.paid ? '✓ Paid' : 'Unpaid'}</td>
+        <td style="padding:8px 10px;border-bottom:1px solid #e5e7eb;color:${r.notes ? '#b91c1c' : '#9ca3af'};">${r.notes || '—'}</td>
       </tr>`).join('');
 
     const mail = {
@@ -337,6 +364,7 @@ cron.schedule('0 12 * * *', async () => {
                   <th style="padding:8px 10px;text-align:left;">Phone</th>
                   <th style="padding:8px 10px;text-align:left;">Email</th>
                   <th style="padding:8px 10px;text-align:left;">Paid</th>
+                  <th style="padding:8px 10px;text-align:left;">Notes</th>
                 </tr>
               </thead>
               <tbody>${rows}</tbody>

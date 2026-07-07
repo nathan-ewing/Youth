@@ -609,7 +609,7 @@
       color: #777;
       margin-bottom: 0.4rem;
     }
-    .rsvp-field input {
+    .rsvp-field input, .rsvp-field textarea {
       width: 100%;
       padding: 0.62rem 0.85rem;
       border: 1.5px solid var(--border);
@@ -621,7 +621,8 @@
       background: var(--white);
       color: var(--text);
     }
-    .rsvp-field input:focus {
+    .rsvp-field textarea { resize: vertical; min-height: 72px; font-family: 'PT Serif', serif; }
+    .rsvp-field input:focus, .rsvp-field textarea:focus {
       border-color: var(--slate);
       box-shadow: 0 0 0 3px rgba(59,74,80,0.1);
     }
@@ -863,6 +864,11 @@
           <label for="rEmail">Email Address</label>
           <input type="email" id="rEmail" placeholder="you@example.com">
         </div>
+      </div>
+
+      <div class="rsvp-field">
+        <label for="rNotes">Medical / Allergy Notes <span style="color:#9ca3af;font-weight:400;">(optional)</span></label>
+        <textarea id="rNotes" placeholder="Allergies, medications, or anything we should know…"></textarea>
       </div>
 
       <div class="rsvp-error" id="rsvpError"></div>
@@ -1146,6 +1152,7 @@
     const parentName  = document.getElementById('rParentName').value.trim();
     const phone       = document.getElementById('rPhone').value.trim();
     const email       = document.getElementById('rEmail').value.trim();
+    const notes       = document.getElementById('rNotes').value.trim();
     const errorEl     = document.getElementById('rsvpError');
 
     if (!studentName || !studentAge || !parentName || !phone || !email) {
@@ -1166,7 +1173,7 @@
       const res = await fetch('/api/rsvp', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ eventId: rsvpCurrentEvent.id, studentName, studentAge, parentName, phone, email })
+        body:    JSON.stringify({ eventId: rsvpCurrentEvent.id, studentName, studentAge, parentName, phone, email, notes })
       });
 
       if (!res.ok) {
