@@ -57,8 +57,13 @@ app.post('/api/upload', requireAuth, upload.single('image'), (req, res) => {
   res.json({ url: `/uploads/${req.file.filename}` });
 });
 
-// Public: get all events
-app.get('/api/events', (req, res) => res.json(readEvents()));
+// Public: get all events (past events filtered out)
+app.get('/api/events', (req, res) => {
+  const now = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Denver' }));
+  const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  const events = readEvents().filter(e => (e.endDate || e.date) >= today);
+  res.json(events);
+});
 
 // Public: get spots remaining for an event
 app.get('/api/events/:id/spots', (req, res) => {
