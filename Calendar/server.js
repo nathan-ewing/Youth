@@ -3,6 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const nodemailer = require('nodemailer');
 const multer = require('multer');
+const cron = require('node-cron');
 
 const uploadStorage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -254,3 +255,69 @@ app.listen(PORT, () => {
   console.log(`Valor Youth Calendar running on port ${PORT}`);
   console.log(`Email sender: ${process.env.EMAIL_USER || '(not set)'}`);
 });
+
+// Daily noon MT: email RSVP roster for tomorrow's RSVP-enabled events
+cron.schedule('0 12 * * *', async () => {
+  const now = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Denver' }));
+  const tomorrow = new Date(now);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const tomorrowStr = `${tomorrow.getFullYear()}-${String(tomorrow.getMonth() + 1).padStart(2, '0')}-${String(tomorrow.getDate()).padStart(2, '0')}`;
+
+  const events = readEvents().filter(e => e.rsvpEnabled && e.date === tomorrowStr);
+  if (!events.length) return;
+
+  const allRsvps = readRsvps();
+
+  for (const event of events) {
+    const rsvps = allRsvps.filter(r => r.eventId === event.id);
+    if (!rsvps.length) continue;
+
+    const rows = rsvps.map((r, i) => `
+      <tr style="background:${i % 2 === 0 ? '#fff' : '#f9f9f9'};">
+        <td style="padding:8px 10px;border-bottom:1px solid #e5e7eb;">${i + 1}</td>
+        <td style="padding:8px 10px;border-bottom:1px solid #e5e7eb;font-weight:600;">${r.studentName}</td>
+        <td style="padding:8px 10px;border-bottom:1px solid #e5e7eb;">${r.studentAge}</td>
+        <td style="padding:8px 10px;border-bottom:1px solid #e5e7eb;">${r.parentName}</td>
+        <td style="padding:8px 10px;border-bottom:1px solid #e5e7eb;">${r.phone}</td>
+        <td style="padding:8px 10px;border-bottom:1px solid #e5e7eb;">${r.email}</td>
+        <td style="padding:8px 10px;border-bottom:1px solid #e5e7eb;color:${r.paid ? '#065f46' : '#9ca3af'};">${r.paid ? '✓ Paid' : 'Unpaid'}</td>
+      </tr>`).join('');
+
+    const mail = {
+      from: `"Valor Youth" <${process.env.EMAIL_USER}>`,
+      to: 'youth@valor.church',
+      subject: `Tomorrow's RSVP List — ${event.title} (${rsvps.length} registered)`,
+      html: `
+        <div style="font-family:sans-serif;max-width:680px;margin:0 auto;">
+          <div style="background:#000;padding:16px 20px;border-radius:8px 8px 0 0;">
+            <h2 style="color:#fff;margin:0;font-size:1.1rem;">Tomorrow's RSVP List — Valor Youth</h2>
+          </div>
+          <div style="background:#f9f9f9;padding:20px;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 8px 8px;">
+            <h3 style="color:#4D3033;margin:0 0 4px;">${event.title}</h3>
+            <p style="margin:0 0 16px;color:#555;font-size:0.9rem;">${event.date}${event.time ? ' &middot; ' + event.time : ''}${event.location ? ' &middot; ' + event.location : ''} &middot; ${rsvps.length} registered</p>
+            <table style="width:100%;border-collapse:collapse;font-size:0.875rem;">
+              <thead>
+                <tr style="background:#000;color:#fff;">
+                  <th style="padding:8px 10px;text-align:left;">#</th>
+                  <th style="padding:8px 10px;text-align:left;">Student</th>
+                  <th style="padding:8px 10px;text-align:left;">Age</th>
+                  <th style="padding:8px 10px;text-align:left;">Parent</th>
+                  <th style="padding:8px 10px;text-align:left;">Phone</th>
+                  <th style="padding:8px 10px;text-align:left;">Email</th>
+                  <th style="padding:8px 10px;text-align:left;">Paid</th>
+                </tr>
+              </thead>
+              <tbody>${rows}</tbody>
+            </table>
+          </div>
+        </div>`
+    };
+
+    try {
+      await createTransporter().sendMail(mail);
+      console.log(`Roster email sent for "${event.title}" (${rsvps.length} registrants)`);
+    } catch (err) {
+      console.error(`Roster email failed for "${event.title}":`, err.message);
+    }
+  }
+}, { timezone: 'America/Denver' });
