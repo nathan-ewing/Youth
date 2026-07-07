@@ -4,9 +4,26 @@ const path = require('path');
 const nodemailer = require('nodemailer');
 const multer = require('multer');
 const cron = require('node-cron');
-const Database = require('@replit/database');
 
-const db = new Database();
+const REPLIT_DB_URL = process.env.REPLIT_DB_URL;
+
+async function dbGet(key) {
+  if (!REPLIT_DB_URL) return null;
+  const res = await fetch(`${REPLIT_DB_URL}/${encodeURIComponent(key)}`);
+  if (!res.ok) return null;
+  const text = await res.text();
+  try { return JSON.parse(text); } catch { return null; }
+}
+
+async function dbSet(key, value) {
+  if (!REPLIT_DB_URL) {
+    console.error('[DB] REPLIT_DB_URL not set — data will not persist');
+    return;
+  }
+  const body = new URLSearchParams([[key, JSON.stringify(value)]]);
+  const res = await fetch(REPLIT_DB_URL, { method: 'POST', body });
+  if (!res.ok) throw new Error(`DB write failed: ${res.status}`);
+}
 
 const uploadStorage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -29,20 +46,16 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 async function readEvents() {
-  let data = await db.get('events');
-  if (typeof data === 'string') { try { data = JSON.parse(data); } catch { data = null; } }
-  return Array.isArray(data) ? data : [];
+  try { const data = await dbGet('events'); return Array.isArray(data) ? data : []; } catch { return []; }
 }
 async function writeEvents(events) {
-  await db.set('events', events);
+  await dbSet('events', events);
 }
 async function readRsvps() {
-  let data = await db.get('rsvps');
-  if (typeof data === 'string') { try { data = JSON.parse(data); } catch { data = null; } }
-  return Array.isArray(data) ? data : [];
+  try { const data = await dbGet('rsvps'); return Array.isArray(data) ? data : []; } catch { return []; }
 }
 async function writeRsvps(rsvps) {
-  await db.set('rsvps', rsvps);
+  await dbSet('rsvps', rsvps);
 }
 
 function generateId() {
@@ -452,19 +465,20 @@ cron.schedule('0 3 1 * *', async () => {
 
 // On startup: migrate data from JSON files if Replit DB is empty
 async function start() {
-  const existing = await db.get('events');
-  if (existing === null || existing === undefined) {
+  if (!REPLIT_DB_URL) console.warn('[DB] REPLIT_DB_URL not set — data will not persist');
+  const existing = await dbGet('events');
+  if (existing === null) {
     try {
       const eventsFile = path.join(__dirname, 'data', 'events.json');
       const rsvpsFile  = path.join(__dirname, 'data', 'rsvps.json');
       const events = fs.existsSync(eventsFile) ? JSON.parse(fs.readFileSync(eventsFile, 'utf8')) : [];
       const rsvps  = fs.existsSync(rsvpsFile)  ? JSON.parse(fs.readFileSync(rsvpsFile,  'utf8')) : [];
-      await db.set('events', events);
-      await db.set('rsvps', rsvps);
+      await dbSet('events', events);
+      await dbSet('rsvps', rsvps);
       console.log(`Migrated ${events.length} events and ${rsvps.length} RSVPs from files to Replit DB`);
     } catch (err) {
-      await db.set('events', []);
-      await db.set('rsvps', []);
+      await dbSet('events', []);
+      await dbSet('rsvps', []);
       console.log('Initialized empty Replit DB');
     }
   }
