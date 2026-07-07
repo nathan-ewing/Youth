@@ -491,17 +491,21 @@ cron.schedule('0 3 1 * *', async () => {
   console.log(`Purged ${staleIds.size} events older than 90 days`);
 }, { timezone: 'America/Denver' });
 
-// On startup: seed DB from JSON files if DB is empty
+// On startup: sync file → DB if file has more events (handles case where
+// events were saved to file before DB_URL was available)
 async function start() {
   console.log(`[DB] REPLIT_DB_URL: ${DB_URL ? 'set' : 'NOT SET'}`);
-  const existing = await dbGet('events');
-  console.log(`[DB] events key on startup: ${existing === null ? 'null' : Array.isArray(existing) ? existing.length + ' events' : typeof existing}`);
-  if (existing === null) {
-    const events = fileRead(EVENTS_F) || [];
-    const rsvps  = fileRead(RSVPS_F)  || [];
-    await dbSet('events', events);
-    await dbSet('rsvps', rsvps);
-    console.log(`[DB] Seeded: ${events.length} events, ${rsvps.length} RSVPs`);
+  const dbEvts    = await dbGet('events');
+  const dbRsvps   = await dbGet('rsvps');
+  const fileEvts  = fileRead(EVENTS_F) || [];
+  const fileRsvps = fileRead(RSVPS_F)  || [];
+
+  if (!Array.isArray(dbEvts) || fileEvts.length > dbEvts.length) {
+    await dbSet('events', fileEvts);
+    await dbSet('rsvps',  fileRsvps);
+    console.log(`[DB] Synced from file: ${fileEvts.length} events, ${fileRsvps.length} RSVPs`);
+  } else {
+    console.log(`[DB] DB current: ${dbEvts.length} events`);
   }
 
   app.listen(PORT, () => {
