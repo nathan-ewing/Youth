@@ -5,4 +5,5 @@ localPort = 3000
 externalPort = 80
 
 [deployment]
-run = ["sh", "-c", "cd Calendar && npm install && node server.js"]
+build = ["sh", "-c", "cd Calendar && npm install"]
+run = ["sh", "-c", "cd Calendar && node server.js"]
