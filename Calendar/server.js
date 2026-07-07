@@ -4,6 +4,9 @@ const path = require('path');
 const nodemailer = require('nodemailer');
 const multer = require('multer');
 const cron = require('node-cron');
+const Database = require('@replit/database');
+
+const db = new Database();
 
 const uploadStorage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -20,27 +23,24 @@ const upload = multer({ storage: uploadStorage, limits: { fileSize: 8 * 1024 * 1
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const EVENTS_FILE = path.join(__dirname, 'data', 'events.json');
-const RSVPS_FILE  = path.join(__dirname, 'data', 'rsvps.json');
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'valor2026';
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-function readEvents() {
-  try { return JSON.parse(fs.readFileSync(EVENTS_FILE, 'utf8')); } catch { return []; }
+async function readEvents() {
+  return (await db.get('events')) || [];
 }
-function writeEvents(events) {
-  fs.mkdirSync(path.dirname(EVENTS_FILE), { recursive: true });
-  fs.writeFileSync(EVENTS_FILE, JSON.stringify(events, null, 2));
+async function writeEvents(events) {
+  await db.set('events', events);
 }
-function readRsvps() {
-  try { return JSON.parse(fs.readFileSync(RSVPS_FILE, 'utf8')); } catch { return []; }
+async function readRsvps() {
+  return (await db.get('rsvps')) || [];
 }
-function writeRsvps(rsvps) {
-  fs.mkdirSync(path.dirname(RSVPS_FILE), { recursive: true });
-  fs.writeFileSync(RSVPS_FILE, JSON.stringify(rsvps, null, 2));
+async function writeRsvps(rsvps) {
+  await db.set('rsvps', rsvps);
 }
+
 function generateId() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2);
 }
@@ -50,6 +50,11 @@ function createTransporter() {
     auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS }
   });
 }
+function requireAuth(req, res, next) {
+  const token = req.headers['x-admin-token'];
+  if (token !== ADMIN_PASSWORD) return res.status(401).json({ error: 'Unauthorized' });
+  next();
+}
 
 // Admin: upload image
 app.post('/api/upload', requireAuth, upload.single('image'), (req, res) => {
@@ -58,20 +63,20 @@ app.post('/api/upload', requireAuth, upload.single('image'), (req, res) => {
 });
 
 // Public: get all events (past events filtered out)
-app.get('/api/events', (req, res) => {
+app.get('/api/events', async (req, res) => {
   const now = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Denver' }));
   const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-  const events = readEvents().filter(e => (e.endDate || e.date) >= today);
+  const events = (await readEvents()).filter(e => (e.endDate || e.date) >= today);
   res.json(events);
 });
 
 // Public: get spots remaining for an event
-app.get('/api/events/:id/spots', (req, res) => {
-  const events = readEvents();
+app.get('/api/events/:id/spots', async (req, res) => {
+  const events = await readEvents();
   const event = events.find(e => e.id === req.params.id);
   if (!event) return res.status(404).json({ error: 'Not found' });
   if (!event.rsvpCapacity) return res.json({ capacity: null, count: 0, available: null, full: false });
-  const count = readRsvps().filter(r => r.eventId === req.params.id).length;
+  const count = (await readRsvps()).filter(r => r.eventId === req.params.id).length;
   const available = Math.max(0, event.rsvpCapacity - count);
   res.json({ capacity: event.rsvpCapacity, count, available, full: available === 0 });
 });
@@ -83,13 +88,12 @@ app.post('/api/rsvp', async (req, res) => {
     return res.status(400).json({ error: 'All fields are required.' });
   }
 
-  const events = readEvents();
+  const events = await readEvents();
   const event = events.find(e => e.id === eventId);
   if (!event) return res.status(404).json({ error: 'Event not found.' });
 
-  const existingRsvps = readRsvps();
+  const existingRsvps = await readRsvps();
 
-  // Prevent duplicate RSVP for the same student (email + name) for the same event
   const duplicate = existingRsvps.find(r =>
     r.eventId === eventId &&
     r.email.toLowerCase() === email.toLowerCase() &&
@@ -107,15 +111,11 @@ app.post('/api/rsvp', async (req, res) => {
   }
 
   const rsvp = { id: generateId(), eventId, studentName, studentAge, parentName, phone, email, notes: notes || '', submittedAt: new Date().toISOString() };
-  const rsvps = readRsvps();
+  const rsvps = await readRsvps();
   rsvps.push(rsvp);
-  writeRsvps(rsvps);
+  await writeRsvps(rsvps);
 
-  const requirePayment = event.requirePayment !== undefined
-    ? event.requirePayment
-    : !!event.cost;
-
-  const transporter = createTransporter();
+  const requirePayment = event.requirePayment !== undefined ? event.requirePayment : !!event.cost;
 
   const staffMail = {
     from: `"Valor Youth Calendar" <${process.env.EMAIL_USER}>`,
@@ -189,68 +189,62 @@ app.post('/api/rsvp', async (req, res) => {
 });
 
 // Admin: update a single RSVP (e.g. mark paid)
-app.patch('/api/rsvps/:id', requireAuth, (req, res) => {
-  const rsvps = readRsvps();
+app.patch('/api/rsvps/:id', requireAuth, async (req, res) => {
+  const rsvps = await readRsvps();
   const idx = rsvps.findIndex(r => r.id === req.params.id);
   if (idx === -1) return res.status(404).json({ error: 'Not found' });
   rsvps[idx] = { ...rsvps[idx], ...req.body };
-  writeRsvps(rsvps);
+  await writeRsvps(rsvps);
   res.json(rsvps[idx]);
 });
 
 // Admin: delete a single RSVP
-app.delete('/api/rsvps/:id', requireAuth, (req, res) => {
-  const rsvps = readRsvps();
+app.delete('/api/rsvps/:id', requireAuth, async (req, res) => {
+  const rsvps = await readRsvps();
   const filtered = rsvps.filter(r => r.id !== req.params.id);
   if (filtered.length === rsvps.length) return res.status(404).json({ error: 'Not found' });
-  writeRsvps(filtered);
+  await writeRsvps(filtered);
   res.json({ ok: true });
 });
 
 // Admin: get all RSVPs
-app.get('/api/rsvps', requireAuth, (req, res) => {
-  res.json(readRsvps());
+app.get('/api/rsvps', requireAuth, async (req, res) => {
+  res.json(await readRsvps());
 });
 
-// Admin: export ALL data (all events unfiltered + all RSVPs) for pre-deploy backup
-app.get('/api/admin/export', requireAuth, (req, res) => {
-  res.json({ events: readEvents(), rsvps: readRsvps() });
+// Admin: export ALL data for reference / manual backup
+app.get('/api/admin/export', requireAuth, async (req, res) => {
+  res.json({ events: await readEvents(), rsvps: await readRsvps() });
 });
 
 // Admin: get RSVPs for one event
-app.get('/api/rsvps/:eventId', requireAuth, (req, res) => {
-  const rsvps = readRsvps().filter(r => r.eventId === req.params.eventId);
+app.get('/api/rsvps/:eventId', requireAuth, async (req, res) => {
+  const rsvps = (await readRsvps()).filter(r => r.eventId === req.params.eventId);
   res.json(rsvps);
 });
 
-function requireAuth(req, res, next) {
-  const token = req.headers['x-admin-token'];
-  if (token !== ADMIN_PASSWORD) return res.status(401).json({ error: 'Unauthorized' });
-  next();
-}
-
-app.post('/api/events', requireAuth, (req, res) => {
-  const events = readEvents();
+app.post('/api/events', requireAuth, async (req, res) => {
+  const events = await readEvents();
   const event = { id: generateId(), ...req.body };
   events.push(event);
-  writeEvents(events);
+  await writeEvents(events);
   res.json(event);
 });
 
-app.put('/api/events/:id', requireAuth, (req, res) => {
-  const events = readEvents();
+app.put('/api/events/:id', requireAuth, async (req, res) => {
+  const events = await readEvents();
   const idx = events.findIndex(e => e.id === req.params.id);
   if (idx === -1) return res.status(404).json({ error: 'Not found' });
   events[idx] = { ...events[idx], ...req.body, id: req.params.id };
-  writeEvents(events);
+  await writeEvents(events);
   res.json(events[idx]);
 });
 
-app.delete('/api/events/:id', requireAuth, (req, res) => {
-  const events = readEvents();
+app.delete('/api/events/:id', requireAuth, async (req, res) => {
+  const events = await readEvents();
   const filtered = events.filter(e => e.id !== req.params.id);
   if (filtered.length === events.length) return res.status(404).json({ error: 'Not found' });
-  writeEvents(filtered);
+  await writeEvents(filtered);
   res.json({ ok: true });
 });
 
@@ -265,7 +259,7 @@ app.post('/api/auth', (req, res) => {
 
 // Public: parent self-cancellation via link in confirmation email
 app.get('/cancel/:rsvpId', async (req, res) => {
-  const rsvps = readRsvps();
+  const rsvps = await readRsvps();
   const rsvp = rsvps.find(r => r.id === req.params.rsvpId);
 
   const page = (title, body) => `<!DOCTYPE html>
@@ -281,9 +275,9 @@ app.get('/cancel/:rsvpId', async (req, res) => {
     return res.send(page('Already Cancelled', '<p>This registration was not found — it may have already been cancelled.</p><p><a href="https://valoryouth.replit.app">Back to calendar</a></p>'));
   }
 
-  const events = readEvents();
+  const events = await readEvents();
   const event = events.find(e => e.id === rsvp.eventId);
-  writeRsvps(rsvps.filter(r => r.id !== req.params.rsvpId));
+  await writeRsvps(rsvps.filter(r => r.id !== req.params.rsvpId));
 
   const eventName = event ? event.title : 'the event';
   res.send(page('Registration Cancelled', `<p><strong>${rsvp.studentName}</strong> has been removed from <strong>${eventName}</strong>.</p><p>Questions? Email <a href="mailto:youth@valor.church">youth@valor.church</a>.</p><p><a href="https://valoryouth.replit.app">Back to calendar</a></p>`));
@@ -314,11 +308,6 @@ app.get('/cancel/:rsvpId', async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`Valor Youth Calendar running on port ${PORT}`);
-  console.log(`Email sender: ${process.env.EMAIL_USER || '(not set)'}`);
-});
-
 // Daily noon MT: email RSVP roster for tomorrow's RSVP-enabled events
 cron.schedule('0 12 * * *', async () => {
   const now = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Denver' }));
@@ -326,10 +315,10 @@ cron.schedule('0 12 * * *', async () => {
   tomorrow.setDate(tomorrow.getDate() + 1);
   const tomorrowStr = `${tomorrow.getFullYear()}-${String(tomorrow.getMonth() + 1).padStart(2, '0')}-${String(tomorrow.getDate()).padStart(2, '0')}`;
 
-  const events = readEvents().filter(e => e.rsvpEnabled && e.date === tomorrowStr);
+  const events = (await readEvents()).filter(e => e.rsvpEnabled && e.date === tomorrowStr);
   if (!events.length) return;
 
-  const allRsvps = readRsvps();
+  const allRsvps = await readRsvps();
 
   for (const event of events) {
     const rsvps = allRsvps.filter(r => r.eventId === event.id);
@@ -395,10 +384,10 @@ cron.schedule('0 8 * * 1', async () => {
   next7.setDate(next7.getDate() + 7);
   const next7Str = `${next7.getFullYear()}-${String(next7.getMonth() + 1).padStart(2, '0')}-${String(next7.getDate()).padStart(2, '0')}`;
 
-  const allEvents = readEvents().filter(e => e.date >= todayStr && e.date <= next7Str);
+  const allEvents = (await readEvents()).filter(e => e.date >= todayStr && e.date <= next7Str);
   if (!allEvents.length) return;
 
-  const allRsvps = readRsvps();
+  const allRsvps = await readRsvps();
   const rows = allEvents.map(e => {
     const count = allRsvps.filter(r => r.eventId === e.id).length;
     return `<tr>
@@ -442,17 +431,44 @@ cron.schedule('0 8 * * 1', async () => {
 }, { timezone: 'America/Denver' });
 
 // 1st of each month at 3am MT: purge events and RSVPs older than 90 days
-cron.schedule('0 3 1 * *', () => {
+cron.schedule('0 3 1 * *', async () => {
   const now = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Denver' }));
   const cutoff = new Date(now);
   cutoff.setDate(cutoff.getDate() - 90);
   const cutoffStr = `${cutoff.getFullYear()}-${String(cutoff.getMonth() + 1).padStart(2, '0')}-${String(cutoff.getDate()).padStart(2, '0')}`;
 
-  const events = readEvents();
+  const events = await readEvents();
   const staleIds = new Set(events.filter(e => (e.endDate || e.date) < cutoffStr).map(e => e.id));
   if (!staleIds.size) return;
 
-  writeEvents(events.filter(e => !staleIds.has(e.id)));
-  writeRsvps(readRsvps().filter(r => !staleIds.has(r.eventId)));
+  await writeEvents(events.filter(e => !staleIds.has(e.id)));
+  await writeRsvps((await readRsvps()).filter(r => !staleIds.has(r.eventId)));
   console.log(`Purged ${staleIds.size} events older than 90 days`);
 }, { timezone: 'America/Denver' });
+
+// On startup: migrate data from JSON files if Replit DB is empty
+async function start() {
+  const existing = await db.get('events');
+  if (existing === null || existing === undefined) {
+    try {
+      const eventsFile = path.join(__dirname, 'data', 'events.json');
+      const rsvpsFile  = path.join(__dirname, 'data', 'rsvps.json');
+      const events = fs.existsSync(eventsFile) ? JSON.parse(fs.readFileSync(eventsFile, 'utf8')) : [];
+      const rsvps  = fs.existsSync(rsvpsFile)  ? JSON.parse(fs.readFileSync(rsvpsFile,  'utf8')) : [];
+      await db.set('events', events);
+      await db.set('rsvps', rsvps);
+      console.log(`Migrated ${events.length} events and ${rsvps.length} RSVPs from files to Replit DB`);
+    } catch (err) {
+      await db.set('events', []);
+      await db.set('rsvps', []);
+      console.log('Initialized empty Replit DB');
+    }
+  }
+
+  app.listen(PORT, () => {
+    console.log(`Valor Youth Calendar running on port ${PORT}`);
+    console.log(`Email sender: ${process.env.EMAIL_USER || '(not set)'}`);
+  });
+}
+
+start();
