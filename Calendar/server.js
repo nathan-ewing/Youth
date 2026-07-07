@@ -170,6 +170,7 @@ app.post('/api/rsvp', async (req, res) => {
             </p>
           </div>` : ''}
           <p style="margin-top:20px;font-size:0.85rem;color:#6b7280;">Questions? Contact us at <a href="mailto:youth@valor.church" style="color:#4D3033;">youth@valor.church</a>.</p>
+          <p style="margin-top:8px;font-size:0.8rem;color:#9ca3af;">Need to cancel? <a href="https://valoryouth.replit.app/cancel/${rsvp.id}" style="color:#9ca3af;">Click here to remove this registration.</a></p>
         </div>
       </div>`
   };
@@ -256,6 +257,32 @@ app.post('/api/auth', (req, res) => {
   }
 });
 
+// Public: parent self-cancellation via link in confirmation email
+app.get('/cancel/:rsvpId', (req, res) => {
+  const rsvps = readRsvps();
+  const rsvp = rsvps.find(r => r.id === req.params.rsvpId);
+
+  const page = (title, body) => `<!DOCTYPE html>
+    <html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>${title} — Valor Youth</title>
+    <style>body{font-family:sans-serif;background:#faf9f6;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;}
+    .card{background:#fff;border:1px solid #e5e2dc;border-radius:10px;padding:36px 32px;max-width:420px;width:90%;text-align:center;}
+    h2{margin:0 0 12px;color:#000;}p{color:#555;margin:0 0 20px;line-height:1.5;}
+    a{color:#4D3033;font-size:0.85rem;}</style></head>
+    <body><div class="card"><h2>${title}</h2>${body}</div></body></html>`;
+
+  if (!rsvp) {
+    return res.send(page('Already Cancelled', '<p>This registration was not found — it may have already been cancelled.</p><p><a href="https://valoryouth.replit.app">Back to calendar</a></p>'));
+  }
+
+  const events = readEvents();
+  const event = events.find(e => e.id === rsvp.eventId);
+  writeRsvps(rsvps.filter(r => r.id !== req.params.rsvpId));
+
+  const eventName = event ? event.title : 'the event';
+  res.send(page('Registration Cancelled', `<p><strong>${rsvp.studentName}</strong> has been removed from <strong>${eventName}</strong>.</p><p>Questions? Email <a href="mailto:youth@valor.church">youth@valor.church</a>.</p><p><a href="https://valoryouth.replit.app">Back to calendar</a></p>`));
+});
+
 app.listen(PORT, () => {
   console.log(`Valor Youth Calendar running on port ${PORT}`);
   console.log(`Email sender: ${process.env.EMAIL_USER || '(not set)'}`);
@@ -325,4 +352,74 @@ cron.schedule('0 12 * * *', async () => {
       console.error(`Roster email failed for "${event.title}":`, err.message);
     }
   }
+}, { timezone: 'America/Denver' });
+
+// Monday 8am MT: weekly summary of upcoming events
+cron.schedule('0 8 * * 1', async () => {
+  const now = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Denver' }));
+  const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  const next7 = new Date(now);
+  next7.setDate(next7.getDate() + 7);
+  const next7Str = `${next7.getFullYear()}-${String(next7.getMonth() + 1).padStart(2, '0')}-${String(next7.getDate()).padStart(2, '0')}`;
+
+  const allEvents = readEvents().filter(e => e.date >= todayStr && e.date <= next7Str);
+  if (!allEvents.length) return;
+
+  const allRsvps = readRsvps();
+  const rows = allEvents.map(e => {
+    const count = allRsvps.filter(r => r.eventId === e.id).length;
+    return `<tr>
+      <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;font-weight:600;">${e.title}</td>
+      <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;">${e.date}${e.time ? ' &middot; ' + e.time : ''}</td>
+      <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;text-align:center;">${e.rsvpEnabled ? count : '—'}</td>
+    </tr>`;
+  }).join('');
+
+  const mail = {
+    from: `"Valor Youth" <${process.env.EMAIL_USER}>`,
+    to: 'youth@valor.church',
+    subject: `This Week's Youth Events — ${todayStr}`,
+    html: `
+      <div style="font-family:sans-serif;max-width:600px;margin:0 auto;">
+        <div style="background:#000;padding:16px 20px;border-radius:8px 8px 0 0;">
+          <h2 style="color:#fff;margin:0;font-size:1.1rem;">This Week — Valor Youth</h2>
+        </div>
+        <div style="background:#f9f9f9;padding:20px;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 8px 8px;">
+          <table style="width:100%;border-collapse:collapse;font-size:0.9rem;">
+            <thead><tr style="background:#000;color:#fff;">
+              <th style="padding:8px 12px;text-align:left;">Event</th>
+              <th style="padding:8px 12px;text-align:left;">Date / Time</th>
+              <th style="padding:8px 12px;text-align:center;">RSVPs</th>
+            </tr></thead>
+            <tbody>${rows}</tbody>
+          </table>
+          <p style="margin-top:16px;font-size:0.85rem;color:#6b7280;">
+            <a href="https://valoryouth.replit.app/admin.html" style="color:#4D3033;">Open admin panel</a>
+          </p>
+        </div>
+      </div>`
+  };
+
+  try {
+    await createTransporter().sendMail(mail);
+    console.log(`Weekly summary sent (${allEvents.length} events)`);
+  } catch (err) {
+    console.error('Weekly summary email failed:', err.message);
+  }
+}, { timezone: 'America/Denver' });
+
+// 1st of each month at 3am MT: purge events and RSVPs older than 90 days
+cron.schedule('0 3 1 * *', () => {
+  const now = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Denver' }));
+  const cutoff = new Date(now);
+  cutoff.setDate(cutoff.getDate() - 90);
+  const cutoffStr = `${cutoff.getFullYear()}-${String(cutoff.getMonth() + 1).padStart(2, '0')}-${String(cutoff.getDate()).padStart(2, '0')}`;
+
+  const events = readEvents();
+  const staleIds = new Set(events.filter(e => (e.endDate || e.date) < cutoffStr).map(e => e.id));
+  if (!staleIds.size) return;
+
+  writeEvents(events.filter(e => !staleIds.has(e.id)));
+  writeRsvps(readRsvps().filter(r => !staleIds.has(r.eventId)));
+  console.log(`Purged ${staleIds.size} events older than 90 days`);
 }, { timezone: 'America/Denver' });
