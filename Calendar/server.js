@@ -5,24 +5,32 @@ const nodemailer = require('nodemailer');
 const multer = require('multer');
 const cron = require('node-cron');
 
-const REPLIT_DB_URL = process.env.REPLIT_DB_URL;
+// ── Storage (Replit DB + JSON file fallback) ───────────────────────────────
+const DB_URL    = process.env.REPLIT_DB_URL;
+const DATA_DIR  = path.join(__dirname, 'data');
+const EVENTS_F  = path.join(DATA_DIR, 'events.json');
+const RSVPS_F   = path.join(DATA_DIR, 'rsvps.json');
+
+function fileRead(f)     { try { return JSON.parse(fs.readFileSync(f, 'utf8')); } catch { return null; } }
+function fileWrite(f, v) { try { fs.mkdirSync(path.dirname(f), { recursive: true }); fs.writeFileSync(f, JSON.stringify(v)); } catch (e) { console.error('[FS]', e.message); } }
 
 async function dbGet(key) {
-  if (!REPLIT_DB_URL) return null;
-  const res = await fetch(`${REPLIT_DB_URL}/${encodeURIComponent(key)}`);
-  if (!res.ok) return null;
-  const text = await res.text();
-  try { return JSON.parse(text); } catch { return null; }
+  if (!DB_URL) return null;
+  try {
+    const r = await fetch(`${DB_URL}/${encodeURIComponent(key)}`);
+    if (r.status === 404) return null;
+    if (!r.ok) { console.error(`[DB] GET ${key} → HTTP ${r.status}`); return null; }
+    return JSON.parse(await r.text());
+  } catch (e) { console.error(`[DB] GET ${key}:`, e.message); return null; }
 }
 
-async function dbSet(key, value) {
-  if (!REPLIT_DB_URL) {
-    console.error('[DB] REPLIT_DB_URL not set — data will not persist');
-    return;
-  }
-  const body = new URLSearchParams([[key, JSON.stringify(value)]]);
-  const res = await fetch(REPLIT_DB_URL, { method: 'POST', body });
-  if (!res.ok) throw new Error(`DB write failed: ${res.status}`);
+async function dbSet(key, val) {
+  if (!DB_URL) { console.warn(`[DB] no REPLIT_DB_URL — ${key} not persisted to DB`); return false; }
+  try {
+    const r = await fetch(DB_URL, { method: 'POST', body: new URLSearchParams([[key, JSON.stringify(val)]]) });
+    if (!r.ok) { console.error(`[DB] SET ${key} → HTTP ${r.status}`); return false; }
+    return true;
+  } catch (e) { console.error(`[DB] SET ${key}:`, e.message); return false; }
 }
 
 const uploadStorage = multer.diskStorage({
@@ -46,16 +54,22 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 async function readEvents() {
-  try { const data = await dbGet('events'); return Array.isArray(data) ? data : []; } catch { return []; }
+  const d = await dbGet('events');
+  if (Array.isArray(d)) return d;
+  return fileRead(EVENTS_F) || [];
 }
-async function writeEvents(events) {
-  await dbSet('events', events);
+async function writeEvents(ev) {
+  fileWrite(EVENTS_F, ev);
+  await dbSet('events', ev);
 }
 async function readRsvps() {
-  try { const data = await dbGet('rsvps'); return Array.isArray(data) ? data : []; } catch { return []; }
+  const d = await dbGet('rsvps');
+  if (Array.isArray(d)) return d;
+  return fileRead(RSVPS_F) || [];
 }
-async function writeRsvps(rsvps) {
-  await dbSet('rsvps', rsvps);
+async function writeRsvps(rs) {
+  fileWrite(RSVPS_F, rs);
+  await dbSet('rsvps', rs);
 }
 
 function generateId() {
@@ -232,6 +246,20 @@ app.get('/api/rsvps', requireAuth, async (req, res) => {
 // Admin: export ALL data for reference / manual backup
 app.get('/api/admin/export', requireAuth, async (req, res) => {
   res.json({ events: await readEvents(), rsvps: await readRsvps() });
+});
+
+// Admin: diagnose DB connectivity
+app.get('/api/admin/dbtest', requireAuth, async (req, res) => {
+  const result = { DB_URL: DB_URL ? 'set' : 'NOT SET' };
+  if (DB_URL) {
+    const ok = await dbSet('__test__', { ts: Date.now() });
+    result.write = ok ? 'ok' : 'failed';
+    const val = await dbGet('__test__');
+    result.read = val ? 'ok' : 'failed';
+  }
+  result.fileEvents = fileRead(EVENTS_F)?.length ?? 'no file';
+  result.dbEvents   = (await dbGet('events'))?.length ?? 'null';
+  res.json(result);
 });
 
 // Admin: get RSVPs for one event
@@ -463,24 +491,17 @@ cron.schedule('0 3 1 * *', async () => {
   console.log(`Purged ${staleIds.size} events older than 90 days`);
 }, { timezone: 'America/Denver' });
 
-// On startup: migrate data from JSON files if Replit DB is empty
+// On startup: seed DB from JSON files if DB is empty
 async function start() {
-  if (!REPLIT_DB_URL) console.warn('[DB] REPLIT_DB_URL not set — data will not persist');
+  console.log(`[DB] REPLIT_DB_URL: ${DB_URL ? 'set' : 'NOT SET'}`);
   const existing = await dbGet('events');
+  console.log(`[DB] events key on startup: ${existing === null ? 'null' : Array.isArray(existing) ? existing.length + ' events' : typeof existing}`);
   if (existing === null) {
-    try {
-      const eventsFile = path.join(__dirname, 'data', 'events.json');
-      const rsvpsFile  = path.join(__dirname, 'data', 'rsvps.json');
-      const events = fs.existsSync(eventsFile) ? JSON.parse(fs.readFileSync(eventsFile, 'utf8')) : [];
-      const rsvps  = fs.existsSync(rsvpsFile)  ? JSON.parse(fs.readFileSync(rsvpsFile,  'utf8')) : [];
-      await dbSet('events', events);
-      await dbSet('rsvps', rsvps);
-      console.log(`Migrated ${events.length} events and ${rsvps.length} RSVPs from files to Replit DB`);
-    } catch (err) {
-      await dbSet('events', []);
-      await dbSet('rsvps', []);
-      console.log('Initialized empty Replit DB');
-    }
+    const events = fileRead(EVENTS_F) || [];
+    const rsvps  = fileRead(RSVPS_F)  || [];
+    await dbSet('events', events);
+    await dbSet('rsvps', rsvps);
+    console.log(`[DB] Seeded: ${events.length} events, ${rsvps.length} RSVPs`);
   }
 
   app.listen(PORT, () => {
