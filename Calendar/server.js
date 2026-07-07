@@ -212,6 +212,11 @@ app.get('/api/rsvps', requireAuth, (req, res) => {
   res.json(readRsvps());
 });
 
+// Admin: export ALL data (all events unfiltered + all RSVPs) for pre-deploy backup
+app.get('/api/admin/export', requireAuth, (req, res) => {
+  res.json({ events: readEvents(), rsvps: readRsvps() });
+});
+
 // Admin: get RSVPs for one event
 app.get('/api/rsvps/:eventId', requireAuth, (req, res) => {
   const rsvps = readRsvps().filter(r => r.eventId === req.params.eventId);
